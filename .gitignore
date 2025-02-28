@@ -1,0 +1,47 @@
+# Virtual Environment
+.venv/
+venv/
+*venv/
+venv/*
+**/venv/**
+ENV/
+
+# Python関連
+.python/  # もしPythonのキャッシュディレクトリを無視したい場合はこちら
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE関連
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ログファイル
+*.log
+simulation_results.json
+
+# ローカル設定ファイル
+.env # 環境変数を記述するファイル
+
+# システム関連
+.DS_Store
+Thumbs.db

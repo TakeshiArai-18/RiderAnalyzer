@@ -1,0 +1,1180 @@
+{
+  "session_info": {
+    "track": "Suzuka Circuit",
+    "date": "2024-03-15",
+    "session_type": "Practice",
+    "track_length": 5.807
+  },
+  "lap_data": [
+    {
+      "Rider": "Rider A",
+      "Lap": 1,
+      "LapTime": "1:32.567",
+      "Sector1": "31.180",
+      "Sector2": "26.696",
+      "Sector3": "34.691",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 26.1
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 2,
+      "LapTime": "1:31.864",
+      "Sector1": "31.000",
+      "Sector2": "26.504",
+      "Sector3": "34.360",
+      "conditions": {
+        "tire": "soft",
+        "weather": "cloudy",
+        "track_temp": 26.1
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 3,
+      "LapTime": "1:31.920",
+      "Sector1": "30.912",
+      "Sector2": "26.303",
+      "Sector3": "34.705",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 26.6
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 4,
+      "LapTime": "1:32.167",
+      "Sector1": "31.308",
+      "Sector2": "26.409",
+      "Sector3": "34.450",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.3
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 5,
+      "LapTime": "1:32.515",
+      "Sector1": "31.297",
+      "Sector2": "26.444",
+      "Sector3": "34.774",
+      "conditions": {
+        "tire": "soft",
+        "weather": "cloudy",
+        "track_temp": 26.8
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 6,
+      "LapTime": "1:32.527",
+      "Sector1": "31.183",
+      "Sector2": "26.567",
+      "Sector3": "34.777",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.1
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 7,
+      "LapTime": "1:32.011",
+      "Sector1": "31.042",
+      "Sector2": "26.637",
+      "Sector3": "34.332",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.0
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 8,
+      "LapTime": "1:32.090",
+      "Sector1": "31.333",
+      "Sector2": "26.471",
+      "Sector3": "34.286",
+      "conditions": {
+        "tire": "soft",
+        "weather": "cloudy",
+        "track_temp": 27.4
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 9,
+      "LapTime": "1:32.430",
+      "Sector1": "31.380",
+      "Sector2": "26.403",
+      "Sector3": "34.647",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.2
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 10,
+      "LapTime": "1:32.161",
+      "Sector1": "30.956",
+      "Sector2": "26.665",
+      "Sector3": "34.540",
+      "conditions": {
+        "tire": "soft",
+        "weather": "cloudy",
+        "track_temp": 27.8
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 11,
+      "LapTime": "1:31.893",
+      "Sector1": "31.011",
+      "Sector2": "26.432",
+      "Sector3": "34.450",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.2
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 12,
+      "LapTime": "1:32.380",
+      "Sector1": "31.383",
+      "Sector2": "26.663",
+      "Sector3": "34.334",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.7
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 13,
+      "LapTime": "1:32.301",
+      "Sector1": "31.087",
+      "Sector2": "26.434",
+      "Sector3": "34.780",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.8
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 14,
+      "LapTime": "1:32.535",
+      "Sector1": "31.415",
+      "Sector2": "26.612",
+      "Sector3": "34.508",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.4
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 15,
+      "LapTime": "1:32.744",
+      "Sector1": "31.336",
+      "Sector2": "26.661",
+      "Sector3": "34.747",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.8
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 16,
+      "LapTime": "1:32.065",
+      "Sector1": "31.224",
+      "Sector2": "26.528",
+      "Sector3": "34.313",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.2
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 17,
+      "LapTime": "1:32.065",
+      "Sector1": "31.432",
+      "Sector2": "26.382",
+      "Sector3": "34.251",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.3
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 18,
+      "LapTime": "1:31.692",
+      "Sector1": "30.949",
+      "Sector2": "26.430",
+      "Sector3": "34.313",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.7
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 19,
+      "LapTime": "1:32.318",
+      "Sector1": "31.068",
+      "Sector2": "26.678",
+      "Sector3": "34.572",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.6
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 20,
+      "LapTime": "1:32.312",
+      "Sector1": "31.038",
+      "Sector2": "26.551",
+      "Sector3": "34.723",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.7
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 21,
+      "LapTime": "1:32.553",
+      "Sector1": "31.483",
+      "Sector2": "26.333",
+      "Sector3": "34.737",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.0
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 22,
+      "LapTime": "1:32.511",
+      "Sector1": "31.476",
+      "Sector2": "26.356",
+      "Sector3": "34.679",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.9
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 23,
+      "LapTime": "1:32.088",
+      "Sector1": "31.066",
+      "Sector2": "26.520",
+      "Sector3": "34.502",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.9
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 24,
+      "LapTime": "1:32.142",
+      "Sector1": "31.360",
+      "Sector2": "26.444",
+      "Sector3": "34.338",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.6
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 25,
+      "LapTime": "1:32.368",
+      "Sector1": "31.493",
+      "Sector2": "26.361",
+      "Sector3": "34.514",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.4
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 26,
+      "LapTime": "1:32.544",
+      "Sector1": "31.429",
+      "Sector2": "26.641",
+      "Sector3": "34.474",
+      "conditions": {
+        "tire": "medium",
+        "weather": "cloudy",
+        "track_temp": 31.3
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 27,
+      "LapTime": "1:32.094",
+      "Sector1": "31.000",
+      "Sector2": "26.478",
+      "Sector3": "34.616",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.8
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 28,
+      "LapTime": "1:31.684",
+      "Sector1": "30.992",
+      "Sector2": "26.358",
+      "Sector3": "34.334",
+      "conditions": {
+        "tire": "medium",
+        "weather": "cloudy",
+        "track_temp": 31.6
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 29,
+      "LapTime": "1:31.851",
+      "Sector1": "30.932",
+      "Sector2": "26.329",
+      "Sector3": "34.590",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 32.2
+      }
+    },
+    {
+      "Rider": "Rider A",
+      "Lap": 30,
+      "LapTime": "1:32.043",
+      "Sector1": "31.198",
+      "Sector2": "26.635",
+      "Sector3": "34.210",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.9
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 1,
+      "LapTime": "1:31.980",
+      "Sector1": "31.227",
+      "Sector2": "26.318",
+      "Sector3": "34.435",
+      "conditions": {
+        "tire": "soft",
+        "weather": "cloudy",
+        "track_temp": 25.8
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 2,
+      "LapTime": "1:32.259",
+      "Sector1": "31.126",
+      "Sector2": "26.595",
+      "Sector3": "34.538",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 26.0
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 3,
+      "LapTime": "1:32.314",
+      "Sector1": "31.324",
+      "Sector2": "26.483",
+      "Sector3": "34.507",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.0
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 4,
+      "LapTime": "1:33.942",
+      "Sector1": "32.297",
+      "Sector2": "26.866",
+      "Sector3": "34.779",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 26.8
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 5,
+      "LapTime": "1:34.552",
+      "Sector1": "32.315",
+      "Sector2": "27.558",
+      "Sector3": "34.679",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.5
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 6,
+      "LapTime": "1:33.695",
+      "Sector1": "31.709",
+      "Sector2": "27.520",
+      "Sector3": "34.466",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.2
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 7,
+      "LapTime": "1:31.998",
+      "Sector1": "31.305",
+      "Sector2": "26.347",
+      "Sector3": "34.346",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.9
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 8,
+      "LapTime": "1:34.873",
+      "Sector1": "32.398",
+      "Sector2": "27.136",
+      "Sector3": "35.339",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.6
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 9,
+      "LapTime": "1:33.541",
+      "Sector1": "32.506",
+      "Sector2": "26.662",
+      "Sector3": "34.373",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.0
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 10,
+      "LapTime": "1:32.270",
+      "Sector1": "31.168",
+      "Sector2": "26.678",
+      "Sector3": "34.424",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.7
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 11,
+      "LapTime": "1:33.886",
+      "Sector1": "31.716",
+      "Sector2": "26.732",
+      "Sector3": "35.438",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.1
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 12,
+      "LapTime": "1:31.971",
+      "Sector1": "31.120",
+      "Sector2": "26.361",
+      "Sector3": "34.490",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.1
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 13,
+      "LapTime": "1:34.283",
+      "Sector1": "32.152",
+      "Sector2": "27.538",
+      "Sector3": "34.593",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 29.1
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 14,
+      "LapTime": "1:31.816",
+      "Sector1": "31.161",
+      "Sector2": "26.310",
+      "Sector3": "34.345",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.5
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 15,
+      "LapTime": "1:34.277",
+      "Sector1": "31.510",
+      "Sector2": "27.309",
+      "Sector3": "35.458",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 29.4
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 16,
+      "LapTime": "1:34.367",
+      "Sector1": "31.966",
+      "Sector2": "27.430",
+      "Sector3": "34.971",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.1
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 17,
+      "LapTime": "1:33.457",
+      "Sector1": "31.891",
+      "Sector2": "26.630",
+      "Sector3": "34.936",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.5
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 18,
+      "LapTime": "1:31.803",
+      "Sector1": "31.015",
+      "Sector2": "26.429",
+      "Sector3": "34.359",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.2
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 19,
+      "LapTime": "1:34.077",
+      "Sector1": "32.323",
+      "Sector2": "26.987",
+      "Sector3": "34.767",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.5
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 20,
+      "LapTime": "1:33.750",
+      "Sector1": "32.380",
+      "Sector2": "27.012",
+      "Sector3": "34.358",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.3
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 21,
+      "LapTime": "1:34.193",
+      "Sector1": "31.624",
+      "Sector2": "27.410",
+      "Sector3": "35.159",
+      "conditions": {
+        "tire": "medium",
+        "weather": "cloudy",
+        "track_temp": 30.0
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 22,
+      "LapTime": "1:35.189",
+      "Sector1": "32.204",
+      "Sector2": "27.498",
+      "Sector3": "35.487",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.9
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 23,
+      "LapTime": "1:33.397",
+      "Sector1": "31.459",
+      "Sector2": "27.142",
+      "Sector3": "34.796",
+      "conditions": {
+        "tire": "medium",
+        "weather": "cloudy",
+        "track_temp": 30.3
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 24,
+      "LapTime": "1:32.198",
+      "Sector1": "31.327",
+      "Sector2": "26.565",
+      "Sector3": "34.306",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.9
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 25,
+      "LapTime": "1:33.454",
+      "Sector1": "31.519",
+      "Sector2": "27.432",
+      "Sector3": "34.503",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.4
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 26,
+      "LapTime": "1:33.455",
+      "Sector1": "31.819",
+      "Sector2": "26.864",
+      "Sector3": "34.772",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.1
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 27,
+      "LapTime": "1:33.267",
+      "Sector1": "31.629",
+      "Sector2": "26.733",
+      "Sector3": "34.905",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.3
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 28,
+      "LapTime": "1:34.504",
+      "Sector1": "32.131",
+      "Sector2": "27.581",
+      "Sector3": "34.792",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.4
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 29,
+      "LapTime": "1:33.235",
+      "Sector1": "31.003",
+      "Sector2": "26.957",
+      "Sector3": "35.275",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.3
+      }
+    },
+    {
+      "Rider": "Rider B",
+      "Lap": 30,
+      "LapTime": "1:32.181",
+      "Sector1": "31.382",
+      "Sector2": "26.452",
+      "Sector3": "34.347",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.9
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 1,
+      "LapTime": "1:36.916",
+      "Sector1": "33.344",
+      "Sector2": "28.313",
+      "Sector3": "35.259",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 26.2
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 2,
+      "LapTime": "1:36.416",
+      "Sector1": "33.169",
+      "Sector2": "27.872",
+      "Sector3": "35.375",
+      "conditions": {
+        "tire": "soft",
+        "weather": "cloudy",
+        "track_temp": 26.4
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 3,
+      "LapTime": "1:36.246",
+      "Sector1": "32.908",
+      "Sector2": "28.019",
+      "Sector3": "35.319",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.0
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 4,
+      "LapTime": "1:34.931",
+      "Sector1": "32.445",
+      "Sector2": "27.569",
+      "Sector3": "34.917",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.0
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 5,
+      "LapTime": "1:35.658",
+      "Sector1": "32.633",
+      "Sector2": "27.885",
+      "Sector3": "35.140",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 26.8
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 6,
+      "LapTime": "1:35.826",
+      "Sector1": "32.525",
+      "Sector2": "27.788",
+      "Sector3": "35.513",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.1
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 7,
+      "LapTime": "1:35.703",
+      "Sector1": "32.756",
+      "Sector2": "27.853",
+      "Sector3": "35.094",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.3
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 8,
+      "LapTime": "1:35.195",
+      "Sector1": "32.263",
+      "Sector2": "27.727",
+      "Sector3": "35.205",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.6
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 9,
+      "LapTime": "1:35.136",
+      "Sector1": "32.842",
+      "Sector2": "27.362",
+      "Sector3": "34.932",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.0
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 10,
+      "LapTime": "1:34.959",
+      "Sector1": "32.211",
+      "Sector2": "27.769",
+      "Sector3": "34.979",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.5
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 11,
+      "LapTime": "1:34.818",
+      "Sector1": "32.650",
+      "Sector2": "27.121",
+      "Sector3": "35.047",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 27.8
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 12,
+      "LapTime": "1:34.067",
+      "Sector1": "32.028",
+      "Sector2": "27.052",
+      "Sector3": "34.987",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.1
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 13,
+      "LapTime": "1:34.864",
+      "Sector1": "32.593",
+      "Sector2": "27.128",
+      "Sector3": "35.143",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 28.8
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 14,
+      "LapTime": "1:34.616",
+      "Sector1": "32.630",
+      "Sector2": "27.008",
+      "Sector3": "34.978",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 29.2
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 15,
+      "LapTime": "1:33.532",
+      "Sector1": "31.943",
+      "Sector2": "27.166",
+      "Sector3": "34.423",
+      "conditions": {
+        "tire": "soft",
+        "weather": "cloudy",
+        "track_temp": 29.4
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 16,
+      "LapTime": "1:33.667",
+      "Sector1": "32.176",
+      "Sector2": "26.908",
+      "Sector3": "34.583",
+      "conditions": {
+        "tire": "medium",
+        "weather": "cloudy",
+        "track_temp": 28.9
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 17,
+      "LapTime": "1:34.123",
+      "Sector1": "32.239",
+      "Sector2": "26.917",
+      "Sector3": "34.967",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.8
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 18,
+      "LapTime": "1:34.095",
+      "Sector1": "32.087",
+      "Sector2": "27.211",
+      "Sector3": "34.797",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.1
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 19,
+      "LapTime": "1:33.189",
+      "Sector1": "31.882",
+      "Sector2": "26.726",
+      "Sector3": "34.581",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 29.8
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 20,
+      "LapTime": "1:33.553",
+      "Sector1": "32.118",
+      "Sector2": "26.734",
+      "Sector3": "34.701",
+      "conditions": {
+        "tire": "medium",
+        "weather": "cloudy",
+        "track_temp": 30.3
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 21,
+      "LapTime": "1:32.970",
+      "Sector1": "32.176",
+      "Sector2": "26.595",
+      "Sector3": "34.199",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.4
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 22,
+      "LapTime": "1:33.619",
+      "Sector1": "31.992",
+      "Sector2": "27.105",
+      "Sector3": "34.522",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.7
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 23,
+      "LapTime": "1:33.612",
+      "Sector1": "32.202",
+      "Sector2": "26.781",
+      "Sector3": "34.629",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 30.8
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 24,
+      "LapTime": "1:33.164",
+      "Sector1": "31.806",
+      "Sector2": "26.566",
+      "Sector3": "34.792",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.1
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 25,
+      "LapTime": "1:32.959",
+      "Sector1": "31.794",
+      "Sector2": "26.829",
+      "Sector3": "34.336",
+      "conditions": {
+        "tire": "medium",
+        "weather": "cloudy",
+        "track_temp": 31.1
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 26,
+      "LapTime": "1:32.789",
+      "Sector1": "31.337",
+      "Sector2": "26.553",
+      "Sector3": "34.899",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.6
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 27,
+      "LapTime": "1:32.889",
+      "Sector1": "31.551",
+      "Sector2": "26.514",
+      "Sector3": "34.824",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.5
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 28,
+      "LapTime": "1:31.825",
+      "Sector1": "31.205",
+      "Sector2": "26.497",
+      "Sector3": "34.123",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 32.0
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 29,
+      "LapTime": "1:32.336",
+      "Sector1": "31.687",
+      "Sector2": "26.338",
+      "Sector3": "34.311",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 31.7
+      }
+    },
+    {
+      "Rider": "Rider C",
+      "Lap": 30,
+      "LapTime": "1:32.110",
+      "Sector1": "31.209",
+      "Sector2": "26.501",
+      "Sector3": "34.400",
+      "conditions": {
+        "tire": "medium",
+        "weather": "dry",
+        "track_temp": 32.3
+      }
+    }
+  ]
+}

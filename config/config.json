@@ -1,0 +1,150 @@
+{
+    "csv_settings": {
+        "lap_time_column": "LapTime",
+        "sector1_column": "Sector1",
+        "sector2_column": "Sector2",
+        "sector3_column": "Sector3",
+        "rider_column": "Rider"
+    },
+    "graph_settings": {
+        "line_color": "#1f77b4",
+        "marker_size": 6,
+        "grid": true,
+        "title_font_size": 14,
+        "axis_font_size": 12
+    },
+    "color_settings": {
+        "fastest_lap": "#00ff00",
+        "slowest_lap": "#ff0000",
+        "normal_lap": "#ffffff"
+    },
+    "display_settings": {
+        "show_grid": true,
+        "show_statistics": true,
+        "decimal_places": 3
+    },
+    "stats_table_settings": {
+        "time_stats": {
+            "fastest": "#C8FFC8",
+            "slowest": "#FFC8C8",
+            "enabled": true
+        },
+        "std_dev_stats": {
+            "highest": "#FFE8C8",
+            "lowest": "#C8E8FF",
+            "enabled": true
+        },
+        "settings": {
+            "time_stats": {
+                "enabled": true,
+                "fastest": "#c8ffc8",
+                "slowest": "#ffc8c8"
+            },
+            "std_dev_stats": {
+                "enabled": true,
+                "highest": "#ffe8c8",
+                "lowest": "#c8e8ff"
+            }
+        }
+    },
+    "app_settings": {
+        "show_graph_window": true
+    },
+    "riders_settings": {
+        "riders_list": [
+            {
+                "id": "rider1",
+                "name": "Default Rider",
+                "bike": "Default Bike",
+                "color": "#1f77b4",
+                "default": true
+            },
+            {
+                "name": "\u85e4\u7530",
+                "bike": "MUSHMANS2025",
+                "color": "#1f77b4",
+                "default": true,
+                "id": "rider2"
+            }
+        ]
+    },
+    "tires_settings": {
+        "tires_list": [
+            {
+                "name": "\u30bd\u30d5\u30c8",
+                "description": "\u30bd\u30d5\u30c8\u30b3\u30f3\u30d1\u30a6\u30f3\u30c9",
+                "color": "#ffc0cb",
+                "default": true,
+                "id": "tire1"
+            },
+            {
+                "name": "\u30df\u30c7\u30a3\u30a2\u30e0",
+                "description": "\u30df\u30c7\u30a3\u30a2\u30e0\u30b3\u30f3\u30d1\u30a6\u30f3\u30c9",
+                "color": "#ffff00",
+                "default": false,
+                "id": "tire2"
+            },
+            {
+                "name": "\u30cf\u30fc\u30c9",
+                "description": "\u30cf\u30fc\u30c9\u30b3\u30f3\u30d1\u30a6\u30f3\u30c9",
+                "color": "#c0c0c0",
+                "default": false,
+                "id": "tire3"
+            }
+        ]
+    },
+    "csv": {
+        "columns": {
+            "lap_time": "LapTime",
+            "sector1": "Sector1",
+            "sector2": "Sector2",
+            "sector3": "Sector3"
+        }
+    },
+    "graph": {
+        "settings": {
+            "type": "Line",
+            "line_width": "1.5",
+            "marker_size": "6.0",
+            "marker_style": "o",
+            "line_style": "-",
+            "show_grid": "No"
+        },
+        "type": "Line",
+        "line_width": "1.5",
+        "marker_size": "6.0",
+        "marker_style": "o",
+        "line_style": "-",
+        "show_grid": "No",
+        "lap_trend_window_size": "3",
+        "radar_window_size": "3",
+        "radar_alpha": "0.2",
+        "rider_color_\u85e4\u7530": "#1f77b4"
+    },
+    "color": {
+        "settings": {
+            "fastest_lap": "#00ff00",
+            "slowest_lap": "#ff0000",
+            "normal_lap": "#ffffff"
+        }
+    },
+    "session": {
+        "settings": {
+            "session": {
+                "name": "\u3082\u3066\u304e\u516c\u958b\u7df4\u7fd21",
+                "circuit": "\u3082\u3066\u304d",
+                "date": "20250314"
+            },
+            "rider": {
+                "name": "\u85e4\u7530",
+                "bike": "MUSHMANS2025"
+            },
+            "conditions": {
+                "tire": "\u30bd\u30d5\u30c8",
+                "weather": "\u6674\u308c",
+                "air_temp": 20.0,
+                "track_temp": 30.0
+            }
+        }
+    }
+}

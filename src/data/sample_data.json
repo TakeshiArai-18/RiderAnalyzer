@@ -1,0 +1,76 @@
+{
+  "riders": {
+    "rider_a": {
+      "name": "ライダーA",
+      "laps": [
+        {
+          "lap_number": 1,
+          "lap_time": "1:45.321",
+          "sectors": {
+            "sector1": "32.123",
+            "sector2": "35.654",
+            "sector3": "37.544"
+          },
+          "conditions": {
+            "tire": "soft",
+            "weather": "dry",
+            "track_temp": 28.5
+          }
+        },
+        {
+          "lap_number": 2,
+          "lap_time": "1:44.876",
+          "sectors": {
+            "sector1": "31.987",
+            "sector2": "35.432",
+            "sector3": "37.457"
+          },
+          "conditions": {
+            "tire": "soft",
+            "weather": "dry",
+            "track_temp": 29.0
+          }
+        }
+      ]
+    },
+    "rider_b": {
+      "name": "ライダーB",
+      "laps": [
+        {
+          "lap_number": 1,
+          "lap_time": "1:45.654",
+          "sectors": {
+            "sector1": "32.345",
+            "sector2": "35.765",
+            "sector3": "37.544"
+          },
+          "conditions": {
+            "tire": "medium",
+            "weather": "dry",
+            "track_temp": 28.5
+          }
+        },
+        {
+          "lap_number": 2,
+          "lap_time": "1:44.987",
+          "sectors": {
+            "sector1": "32.123",
+            "sector2": "35.432",
+            "sector3": "37.432"
+          },
+          "conditions": {
+            "tire": "medium",
+            "weather": "dry",
+            "track_temp": 29.0
+          }
+        }
+      ]
+    }
+  },
+  "session_info": {
+    "track": "Suzuka Circuit",
+    "date": "2024-03-15",
+    "session_type": "Practice",
+    "track_length": 5.807
+  }
+}

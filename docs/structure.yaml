@@ -1,0 +1,197 @@
+src:
+  structure.yaml:
+    content: |-
+      Lap Time Analyzer for Rider Performance Visualization プロジェクト構造
+      - 開発言語: Python
+      - UIフレームワーク: PyQt5
+      - データ分析: pandas, numpy
+      - グラフ描画: matplotlib, seaborn (plotlyも検討)
+      - データ入力: JSON, CSV, テーブル入力
+      - データ可視化: グラフ、チャート、色分けテーブル
+      - 主要機能: データ入力、ラップタイム分析、セクタータイム分析、ライダーパフォーマンス可視化、UI機能、その他機能
+    dependency: []
+    agent: "claude-3-5-sonnet-20241022"
+    api: []
+
+  main.py:
+    content: |-
+      メインのエントリーポイント
+      - PyQt5アプリケーションの初期化
+      - メインウィンドウの作成と表示
+      - イベントループの開始
+    dependency:
+      - src/ui/main_window.py
+      - src/app/analyzer.py
+    agent: "claude-3-5-sonnet-20241022"
+    api: []
+
+  ui:
+    main_window.py:
+      content: |-
+        メインウィンドウのUI定義
+        - データ入力エリア (JSON, CSV, テーブル)
+        - グラフ表示エリア
+        - データテーブル表示エリア
+        - 設定ボタン
+        - メニューバー
+      dependency:
+        - src/ui/data_input_widget.py
+        - src/ui/graph_widget.py
+        - src/ui/table_widget.py
+        - src/ui/settings_dialog.py
+        - src/app/analyzer.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    data_input_widget.py:
+      content: |-
+        データ入力エリアのUI定義
+        - JSONファイル読み込みボタン
+        - CSVファイル読み込みボタン
+        - テーブル形式データ入力エリア (QTableWidget)
+      dependency:
+        - src/app/data_loader.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    graph_widget.py:
+      content: |-
+        グラフ表示エリアのUI定義
+        - matplotlibまたはseabornのグラフ表示領域
+        - グラフの種類選択 (ドロップダウン)
+        - グラフ設定ボタン
+      dependency:
+        - src/app/analyzer.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    table_widget.py:
+      content: |-
+        データテーブル表示エリアのUI定義
+        - QTableWidgetによるデータ表示
+        - 色分け表示 (最速/最遅ラップ、セクター)
+      dependency:
+        - src/app/analyzer.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    settings_dialog.py:
+      content: |-
+        設定画面のUI定義
+        - データカラム設定 (CSV)
+        - グラフ設定
+        - 色設定
+      dependency:
+        - src/app/config_manager.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+  app:
+    analyzer.py:
+      content: |-
+        データ分析ロジック
+        - 平均ラップタイム計算
+        - 標準偏差計算
+        - セクタータイム分析
+        - ライダーパフォーマンス可視化
+      dependency:
+        - src/app/data_loader.py
+        - src/app/config_manager.py
+        - src/utils/time_converter.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    data_loader.py:
+      content: |-
+        データ読み込みロジック
+        - JSONファイル読み込み
+        - CSVファイル読み込み
+        - テーブルデータ読み込み
+      dependency:
+        - src/app/config_manager.py
+        - src/utils/time_converter.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    config_manager.py:
+      content: |-
+        設定管理ロジック
+        - 設定ファイルの読み込み/保存
+        - デフォルト設定の提供
+      dependency: []
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+  utils:
+    time_converter.py:
+      content: |-
+        時間変換ユーティリティ
+        - mm:ss.fff 形式の文字列を秒に変換
+        - 秒を mm:ss.fff 形式の文字列に変換
+      dependency: []
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+  data:
+    sample_data.json:
+      content: |-
+        サンプルラップタイムデータ (JSON形式)
+        - ライダーA, ライダーB のラップタイムデータ
+      dependency: []
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+  docs:
+    README.md:
+      content: |-
+        ソフトウェアの説明、使い方、開発環境構築手順
+        - ソフトウェア概要
+        - 必要なライブラリ
+        - 開発環境構築手順
+        - 使い方
+        - 注意事項
+        目次:
+        - ソフトウェア概要 (200文字)
+        - 必要なライブラリ (150文字)
+        - 開発環境構築手順 (300文字)
+        - 使い方 (400文字)
+        - 注意事項 (150文字)
+        デザイン・フォント:
+        - 全体: シンプルで読みやすいデザイン
+        - フォント: Arial, Helvetica, sans-serif
+      dependency: []
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+  venv:
+    create_venv.bat:
+      content: |-
+        Python仮想環境構築用バッチファイル
+        - 仮想環境の作成
+        - 必要なライブラリのインストール
+      dependency:
+        - src/requirements.txt
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    run_app.bat:
+      content: |-
+        ソフトウェア起動用バッチファイル
+        - 仮想環境のアクティベート
+        - ソフトウェアの実行
+      dependency:
+        - src/main.py
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
+
+    requirements.txt:
+      content: |-
+        必要なPythonライブラリ一覧
+        - PyQt5
+        - pandas
+        - numpy
+        - matplotlib
+        - seaborn
+      dependency: []
+      agent: "claude-3-5-sonnet-20241022"
+      api: []
