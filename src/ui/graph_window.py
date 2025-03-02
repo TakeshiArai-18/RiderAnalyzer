@@ -41,9 +41,9 @@ class GraphWindow(QMainWindow):
     def update_data(self, data, analysis_results=None):
         """データを更新"""
         self.graph_widget.update_data(data, analysis_results)
-        # データ更新時にウィンドウを前面に表示（設定で有効な場合）
-        show_graph = self.graph_widget.analyzer.config_manager.get_setting("app_settings", "show_graph_window")
-        if show_graph:
+        
+        # 解析結果がある場合のみウィンドウを表示する（設定で有効な場合）
+        if analysis_results and self.graph_widget.analyzer.config_manager.get_setting("app_settings", "show_graph_window"):
             # 親ウィンドウと同じ位置に配置
             self.set_position_from_parent()
             self.show()

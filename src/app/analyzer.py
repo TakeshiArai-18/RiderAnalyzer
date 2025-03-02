@@ -107,19 +107,25 @@ class LapTimeAnalyzer:
             'total_laps': 0
         }
 
-    def get_rider_stats(self, rider: str, laps: List[Dict]) -> Optional[Dict]:
+    def get_rider_stats(self, rider: str, laps: List[Dict], analysis_results=None) -> Optional[Dict]:
         """特定のライダーの統計を取得する"""
         try:
-            analysis = self.analyze_laps(laps)
+            if analysis_results is None:
+                analysis = self.analyze_laps(laps)
+            else:
+                analysis = analysis_results
             return analysis['rider_stats'].get(rider)
         except Exception as e:
             print(f"Error in get_rider_stats: {str(e)}")
             return None
 
-    def get_sector_stats(self, laps: List[Dict]) -> Dict:
+    def get_sector_stats(self, laps: List[Dict], analysis_results=None) -> Dict:
         """セクター統計を取得する"""
         try:
-            analysis = self.analyze_laps(laps)
+            if analysis_results is None:
+                analysis = self.analyze_laps(laps)
+            else:
+                analysis = analysis_results
             return analysis['sector_stats']
         except Exception as e:
             print(f"Error in get_sector_stats: {str(e)}")

@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
         # データ入力ウィジェット
         self.data_input = DataInputWidget(config_manager=self.config_manager)
         self.data_input.data_changed.connect(self.on_data_changed)
+        self.data_input.analyze_requested.connect(self.on_analyze_requested)  # 新しい接続
         
         # ボタンのイベントを接続
         self.data_input.load_json_button.clicked.connect(self.open_json_file)
@@ -155,17 +156,13 @@ class MainWindow(QMainWindow):
             if not data or 'lap_data' not in data:
                 return
 
-            # 既存の分析
-            analysis_results = self.analyzer.analyze_laps(data['lap_data'])
+            # 解析なしで各ウィジェットを更新
+            self.data_input.update_data(data['lap_data'], None)
+            self.table_widget.update_data(data['lap_data'], None)
+            self.graph_window.update_data(data['lap_data'], None)
             
-            # 移動平均統計の計算
-            moving_stats = self.analyzer.calculate_moving_statistics(data['lap_data'])
-
-            # 各ウィジェットの更新
-            self.data_input.update_data(data['lap_data'], analysis_results)
-            self.table_widget.update_data(data['lap_data'], analysis_results)
-            self.graph_window.update_data(data['lap_data'], analysis_results)
-            self.stats_table.update_statistics(moving_stats)
+            # 解析が必要な旨を通知
+            QMessageBox.information(self, "Information", "Data loaded. Click 'Analyze Data' to perform analysis.")
         except Exception as e:
             print(f"Error processing data: {str(e)}")
             QMessageBox.critical(self, "Error", f"Failed to process data: {str(e)}")
@@ -175,15 +172,34 @@ class MainWindow(QMainWindow):
         try:
             if not data:
                 return
-
-            # 分析結果を取得
-            analysis_results = self.analyzer.analyze_laps(data)
-
-            # 各ウィジェットを更新
-            self.table_widget.update_data(data, analysis_results)
-            self.graph_window.update_data(data, analysis_results)
+            
+            # 解析なしでテーブルデータのみ更新
+            self.table_widget.update_data(data, None)
+            self.graph_window.update_data(data, None)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to update data: {str(e)}")
+
+    def on_analyze_requested(self, data):
+        """データ解析リクエスト時の処理"""
+        if not data:
+            return
+        
+        try:
+            # 分析結果を取得
+            analysis_results = self.analyzer.analyze_laps(data)
+            
+            # 各ウィジェットに分析結果を反映
+            self.table_widget.update_data(data, analysis_results)
+            self.graph_window.update_data(data, analysis_results)
+            
+            # 移動平均統計の計算
+            moving_stats = self.analyzer.calculate_moving_statistics(data)
+            self.stats_table.update_statistics(moving_stats)
+            
+            QMessageBox.information(self, "Information", "Analysis completed successfully.")
+        except Exception as e:
+            print(f"Error analyzing data: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Failed to analyze data: {str(e)}")
 
     def on_settings_updated(self, settings):
         """設定が更新されたときの処理"""

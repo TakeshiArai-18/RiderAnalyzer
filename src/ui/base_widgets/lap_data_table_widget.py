@@ -90,25 +90,27 @@ class LapDataTableWidget(BaseTableWidget):
             self.table.setItem(row, 8, QTableWidgetItem(str(lap.get('TrackTemp', ''))))
 
             # 最速/最遅ラップの色付け
-            if self.analysis_results and 'rider_stats' in self.analysis_results:
+            if self.analysis_results:  # analysis_resultsがNoneでないことを確認
                 row_color = None
                 current_rider = lap['Rider']
                 current_lap_time = lap['LapTime']
 
                 # 選択されたライダーの場合は個別の最速/最遅を使用
                 if selected_rider != 'All Riders' and current_rider == selected_rider:
-                    rider_stats = self.analysis_results['rider_stats'].get(current_rider)
-                    if rider_stats:
-                        if current_lap_time == rider_stats['best_lap']['LapTime']:
-                            row_color = TableColorUtils.get_best_time_color()
-                        elif current_lap_time == rider_stats['worst_lap']['LapTime']:
-                            row_color = TableColorUtils.get_worst_time_color()
+                    if 'rider_stats' in self.analysis_results:
+                        rider_stats = self.analysis_results.get('rider_stats', {}).get(current_rider)
+                        if rider_stats and 'best_lap' in rider_stats and 'worst_lap' in rider_stats:
+                            if current_lap_time == rider_stats['best_lap']['LapTime']:
+                                row_color = TableColorUtils.get_best_time_color()
+                            elif current_lap_time == rider_stats['worst_lap']['LapTime']:
+                                row_color = TableColorUtils.get_worst_time_color()
                 # 全ライダー表示の場合は全体の最速/最遅を使用
                 elif selected_rider == 'All Riders':
-                    if current_lap_time == self.analysis_results['fastest_lap']['LapTime']:
-                        row_color = TableColorUtils.get_best_time_color()
-                    elif current_lap_time == self.analysis_results['slowest_lap']['LapTime']:
-                        row_color = TableColorUtils.get_worst_time_color()
+                    if 'fastest_lap' in self.analysis_results and 'slowest_lap' in self.analysis_results:
+                        if current_lap_time == self.analysis_results['fastest_lap']['LapTime']:
+                            row_color = TableColorUtils.get_best_time_color()
+                        elif current_lap_time == self.analysis_results['slowest_lap']['LapTime']:
+                            row_color = TableColorUtils.get_worst_time_color()
 
                 if row_color:
                     self.apply_color_to_row(row, row_color)  # 基底クラスのメソッドを使用

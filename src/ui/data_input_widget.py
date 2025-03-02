@@ -6,6 +6,7 @@ from PyQt5.QtGui import QColor
 
 class DataInputWidget(QWidget):
     data_changed = pyqtSignal(list)  # データが変更されたときのシグナル
+    analyze_requested = pyqtSignal(list)  # 解析リクエスト用の新しいシグナル
 
     def __init__(self, parent=None, config_manager=None):
         super().__init__(parent)
@@ -25,6 +26,11 @@ class DataInputWidget(QWidget):
         self.add_lap_button = QPushButton('Add Lap')
         self.delete_data_button = QPushButton('Delete Data')
 
+        # 解析ボタンを追加
+        self.analyze_button = QPushButton('Analyze Data')
+        self.analyze_button.setToolTip('Run analysis on current lap data')
+        self.analyze_button.clicked.connect(self.analyze_clicked)
+
         # ボタンの接続
         self.load_json_button.clicked.connect(self.load_json_clicked)
         self.load_csv_button.clicked.connect(self.load_csv_clicked)
@@ -36,6 +42,7 @@ class DataInputWidget(QWidget):
         button_layout.addWidget(self.load_csv_button)
         button_layout.addWidget(self.add_lap_button)
         button_layout.addWidget(self.delete_data_button)
+        button_layout.addWidget(self.analyze_button)
         button_layout.addStretch()
 
         layout.addLayout(button_layout)
@@ -191,8 +198,8 @@ class DataInputWidget(QWidget):
                 # ラップデータに追加
                 self.lap_data.append(new_lap)
                 
-                # テーブルを更新
-                self.update_data(self.lap_data)
+                # テーブルを更新（解析結果なし）
+                self.update_data(self.lap_data, None)
                 
                 # 変更シグナルを発行
                 self.data_changed.emit(self.lap_data)
@@ -213,7 +220,7 @@ class DataInputWidget(QWidget):
 
         if reply == QMessageBox.Yes:
             self.lap_data = []
-            self.update_data(self.lap_data)
+            self.update_data(self.lap_data, None)
             self.data_changed.emit(self.lap_data)
 
     def update_data(self, laps, analysis_results=None):
@@ -236,10 +243,19 @@ class DataInputWidget(QWidget):
             self.table.setItem(row, 8, QTableWidgetItem(str(lap.get('TrackTemp', ''))))
 
             # 最速/最遅ラップの色付け
-            if analysis_results:
+            if analysis_results and 'fastest_lap' in analysis_results and 'slowest_lap' in analysis_results:
                 if lap == analysis_results['fastest_lap']:
                     for col in range(9):  # 列数を変更
                         self.table.item(row, col).setBackground(QColor(200, 255, 200))
                 elif lap == analysis_results['slowest_lap']:
                     for col in range(9):  # 列数を変更
                         self.table.item(row, col).setBackground(QColor(255, 200, 200))
+
+    def analyze_clicked(self):
+        """解析ボタンがクリックされたときのハンドラ"""
+        if not self.lap_data:
+            QMessageBox.warning(self, "Warning", "No data to analyze.")
+            return
+        
+        # 解析リクエストを発行
+        self.analyze_requested.emit(self.lap_data)
