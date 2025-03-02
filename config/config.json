@@ -53,13 +53,6 @@
     "riders_settings": {
         "riders_list": [
             {
-                "id": "rider1",
-                "name": "Default Rider",
-                "bike": "Default Bike",
-                "color": "#1f77b4",
-                "default": true
-            },
-            {
                 "name": "\u85e4\u7530",
                 "bike": "MUSHMANS2025",
                 "color": "#1f77b4",

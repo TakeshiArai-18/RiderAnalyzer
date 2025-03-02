@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QTabWidget, 
                              QLabel, QLineEdit, QPushButton, QGroupBox, QComboBox,
                              QDoubleSpinBox, QCheckBox, QColorDialog, QGridLayout, QWidget,
-                             QSpinBox)
-from PyQt5.QtCore import pyqtSignal
+                             QSpinBox, QTableWidget, QTableWidgetItem, QHeaderView)
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 from app.config_manager import ConfigManager
 
@@ -35,6 +35,296 @@ class ColorButton(QPushButton):
         if color_str:
             self._color = QColor(color_str)
             self._update_style()
+
+class ItemManagerWidget(QWidget):
+    """ライダーやタイヤなどの項目管理用の共通ウィジェット"""
+    
+    def __init__(self, parent=None, config_manager=None, item_type=None):
+        """
+        初期化
+        
+        Parameters:
+        -----------
+        parent : QWidget
+            親ウィジェット
+        config_manager : ConfigManager
+            設定管理オブジェクト
+        item_type : str
+            管理する項目のタイプ（"rider" または "tire"）
+        """
+        super().__init__(parent)
+        self.config_manager = config_manager
+        self.item_type = item_type
+        self.item_rows = {}  # ID:行インデックスのマッピング
+        
+        # メソッド名を動的に設定
+        self.get_items_method = f"get_{item_type}s_list"
+        self.add_item_method = f"add_{item_type}"
+        self.delete_item_method = f"delete_{item_type}"
+        self.update_item_method = f"update_{item_type}"
+        
+        self._init_ui()
+    
+    def _init_ui(self):
+        """UIの初期化"""
+        layout = QVBoxLayout(self)
+        
+        # テーブル用のグループボックス
+        type_name = "ライダー" if self.item_type == "rider" else "タイヤ"
+        table_group = QGroupBox(f"登録済み{type_name}")
+        table_layout = QVBoxLayout()
+        
+        # テーブルの作成
+        self.table = QTableWidget()
+        
+        # item_typeに応じてテーブル列を設定
+        if self.item_type == "rider":
+            self.table.setColumnCount(4)
+            self.table.setHorizontalHeaderLabels(["名前", "バイク", "カラー", "デフォルト"])
+        else:  # tire
+            self.table.setColumnCount(4)
+            self.table.setHorizontalHeaderLabels(["名前", "説明", "カラー", "デフォルト"])
+        
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setSelectionMode(QTableWidget.SingleSelection)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)  # 直接編集を無効化
+        
+        # テーブルのサイズ調整
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        
+        table_layout.addWidget(self.table)
+        
+        # テーブル下部のボタン
+        buttons_layout = QHBoxLayout()
+        self.delete_button = QPushButton("削除")
+        self.delete_button.setEnabled(False)  # 初期状態では無効
+        self.delete_button.clicked.connect(self.delete_selected_item)
+        
+        buttons_layout.addWidget(self.delete_button)
+        buttons_layout.addStretch()
+        
+        table_layout.addLayout(buttons_layout)
+        table_group.setLayout(table_layout)
+        layout.addWidget(table_group)
+        
+        # 新規追加・編集用フォーム
+        form_group = QGroupBox(f"{type_name}情報")
+        self.form_layout = QGridLayout()
+        
+        # 名前（共通）
+        self.form_layout.addWidget(QLabel("名前:"), 0, 0)
+        self.name_edit = QLineEdit()
+        self.form_layout.addWidget(self.name_edit, 0, 1)
+        
+        # item_typeに応じて2行目の項目を変更
+        if self.item_type == "rider":
+            self.form_layout.addWidget(QLabel("バイク:"), 1, 0)
+            self.second_edit = QLineEdit()
+        else:  # tire
+            self.form_layout.addWidget(QLabel("説明:"), 1, 0)
+            self.second_edit = QLineEdit()
+        
+        self.form_layout.addWidget(self.second_edit, 1, 1)
+        
+        # 色設定（共通）
+        self.form_layout.addWidget(QLabel("カラー:"), 2, 0)
+        self.color_button = ColorButton("")
+        default_color = "#1f77b4" if self.item_type == "rider" else "#000000"
+        self.color_button.set_color(default_color)
+        self.form_layout.addWidget(self.color_button, 2, 1)
+        
+        # デフォルト設定（共通）
+        self.default_checkbox = QCheckBox("デフォルト")
+        self.form_layout.addWidget(self.default_checkbox, 3, 0, 1, 2)
+        
+        # 追加・更新ボタン
+        buttons_layout = QHBoxLayout()
+        self.add_button = QPushButton("追加")
+        self.add_button.clicked.connect(self.add_item)
+        
+        buttons_layout.addStretch()
+        buttons_layout.addWidget(self.add_button)
+        
+        self.form_layout.addLayout(buttons_layout, 4, 0, 1, 2)
+        form_group.setLayout(self.form_layout)
+        layout.addWidget(form_group)
+        
+        # テーブルの行選択時のイベント
+        self.table.itemSelectionChanged.connect(self.on_item_selection_changed)
+        
+        # フォームカスタマイズのチャンス（サブクラスで上書きする想定）
+        self.customize_form()
+        
+        # アイテムリストを表示
+        self.populate_items_list()
+    
+    def customize_form(self):
+        """フォームをカスタマイズするためのメソッド（サブクラスでオーバーライド可能）"""
+        pass
+    
+    def populate_items_list(self):
+        """アイテムリストをテーブルに表示"""
+        # テーブルをクリア
+        self.table.setRowCount(0)
+        
+        # IDと対応する行インデックスをクリア
+        self.item_rows = {}
+        
+        # リストを取得
+        get_list_func = getattr(self.config_manager, self.get_items_method)
+        items_list = get_list_func()
+        
+        # テーブルに追加
+        for item in items_list:
+            row = self.table.rowCount()
+            self.table.insertRow(row)
+            
+            item_id = item.get("id")
+            self.item_rows[item_id] = row
+            
+            # 名前
+            name_item = QTableWidgetItem(item.get("name", ""))
+            name_item.setData(Qt.UserRole, item_id)  # IDを非表示データとして保存
+            self.table.setItem(row, 0, name_item)
+            
+            # 2列目（バイクまたは説明）
+            if self.item_type == "rider":
+                second_item = QTableWidgetItem(item.get("bike", ""))
+            else:  # tire
+                second_item = QTableWidgetItem(item.get("description", ""))
+            self.table.setItem(row, 1, second_item)
+            
+            # カラー（セルを色で塗る）
+            color_item = QTableWidgetItem()
+            default_color = "#1f77b4" if self.item_type == "rider" else "#000000"
+            color = item.get("color", default_color)
+            color_item.setBackground(QColor(color))
+            self.table.setItem(row, 2, color_item)
+            
+            # デフォルト
+            default_item = QTableWidgetItem()
+            default_item.setCheckState(Qt.Checked if item.get("default", False) else Qt.Unchecked)
+            self.table.setItem(row, 3, default_item)
+        
+        # 選択状態をリセット
+        self.reset_form()
+        self.delete_button.setEnabled(False)
+    
+    def on_item_selection_changed(self):
+        """テーブルで行が選択されたときの処理"""
+        selected_rows = self.table.selectionModel().selectedRows()
+        
+        if selected_rows:
+            # 削除ボタンを有効化
+            self.delete_button.setEnabled(True)
+        else:
+            # 選択解除時は削除ボタンを無効化
+            self.delete_button.setEnabled(False)
+    
+    def add_item(self):
+        """新しいアイテムを追加"""
+        # フォームからデータを取得
+        if self.item_type == "rider":
+            new_item = {
+                "name": self.name_edit.text() or f"New {self.item_type.capitalize()}",
+                "bike": self.second_edit.text(),
+                "color": self.color_button.get_color(),
+                "default": self.default_checkbox.isChecked()
+            }
+        else:  # tire
+            new_item = {
+                "name": self.name_edit.text() or f"New {self.item_type.capitalize()}",
+                "description": self.second_edit.text(),
+                "color": self.color_button.get_color(),
+                "default": self.default_checkbox.isChecked()
+            }
+        
+        # データベースに追加
+        add_func = getattr(self.config_manager, self.add_item_method)
+        add_func(new_item)
+        
+        # 表示を更新
+        self.populate_items_list()
+        self.reset_form()
+    
+    def delete_selected_item(self):
+        """選択されたアイテムを削除"""
+        selected_rows = self.table.selectionModel().selectedRows()
+        
+        if selected_rows:
+            row = selected_rows[0].row()
+            item_id = self.table.item(row, 0).data(Qt.UserRole)
+            
+            # データベースから削除
+            delete_func = getattr(self.config_manager, self.delete_item_method)
+            delete_func(item_id)
+            
+            # 表示を更新
+            self.populate_items_list()
+    
+    def reset_form(self):
+        """情報フォームをリセット"""
+        self.name_edit.clear()
+        self.second_edit.clear()
+        default_color = "#1f77b4" if self.item_type == "rider" else "#000000"
+        self.color_button.set_color(default_color)
+        self.default_checkbox.setChecked(False)
+        self.add_button.setText("追加")
+    
+    def get_items_dict(self):
+        """
+        現在のアイテムの状態をすべて取得
+        
+        Returns:
+        --------
+        dict: {item_id: item_data, ...}
+        """
+        items_dict = {}
+        
+        for i in range(self.table.rowCount()):
+            item_id = self.table.item(i, 0).data(Qt.UserRole)
+            
+            if self.item_type == "rider":
+                item_data = {
+                    "name": self.table.item(i, 0).text(),
+                    "bike": self.table.item(i, 1).text(),
+                    "color": self.table.item(i, 2).background().color().name(),
+                    "default": self.table.item(i, 3).checkState() == Qt.Checked
+                }
+            else:  # tire
+                item_data = {
+                    "name": self.table.item(i, 0).text(),
+                    "description": self.table.item(i, 1).text(),
+                    "color": self.table.item(i, 2).background().color().name(),
+                    "default": self.table.item(i, 3).checkState() == Qt.Checked
+                }
+            
+            items_dict[item_id] = item_data
+        
+        return items_dict
+
+class RiderManagerWidget(ItemManagerWidget):
+    """ライダー管理用ウィジェット"""
+    
+    def __init__(self, parent=None, config_manager=None):
+        super().__init__(parent, config_manager, "rider")
+    
+    def customize_form(self):
+        """ライダー特有のフォームカスタマイズ"""
+        # 必要に応じてライダー特有の追加フィールドなどをここに実装
+        pass
+
+class TireManagerWidget(ItemManagerWidget):
+    """タイヤ管理用ウィジェット"""
+    
+    def __init__(self, parent=None, config_manager=None):
+        super().__init__(parent, config_manager, "tire")
+    
+    def customize_form(self):
+        """タイヤ特有のフォームカスタマイズ"""
+        # 必要に応じてタイヤ特有の追加フィールドなどをここに実装
+        pass
 
 class StatsColorSettingsWidget(QWidget):
     def __init__(self, config_manager, parent=None):
@@ -463,225 +753,15 @@ class SettingsDialog(QDialog):
 
     def create_riders_tab(self):
         """ライダー管理タブを作成"""
-        widget = QWidget()
-        layout = QVBoxLayout()
-        
-        # ライダーリスト用のグループボックス
-        rider_group = QGroupBox("登録済みライダー")
-        rider_layout = QVBoxLayout()
-        
-        # ライダーリストを表示
-        self.riders_layout = QVBoxLayout()
-        self.populate_riders_list()
-        rider_layout.addLayout(self.riders_layout)
-        
-        # 新規ライダー追加ボタン
-        add_rider_button = QPushButton("ライダーを追加")
-        add_rider_button.clicked.connect(self.add_rider)
-        rider_layout.addWidget(add_rider_button)
-        
-        rider_group.setLayout(rider_layout)
-        layout.addWidget(rider_group)
-        
-        # ライダー設定保存用
-        self.rider_editors = {}
-        self.rider_color_buttons = {}
-        
-        widget.setLayout(layout)
-        return widget
-    
-    def populate_riders_list(self):
-        """ライダーリストを表示"""
-        # まず既存のウィジェットをクリア
-        for i in reversed(range(self.riders_layout.count())):
-            widget = self.riders_layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
-        
-        # 保存用の辞書をクリア
-        self.rider_editors = {}
-        self.rider_color_buttons = {}
-        
-        # ライダーリストを取得
-        riders_list = self.config_manager.get_riders_list()
-        
-        for rider in riders_list:
-            # ライダー情報表示用のウィジェット
-            rider_widget = QWidget()
-            rider_layout = QGridLayout()
-            rider_widget.setLayout(rider_layout)
-            
-            # ライダー名
-            rider_layout.addWidget(QLabel("名前:"), 0, 0)
-            name_edit = QLineEdit(rider.get("name", ""))
-            rider_layout.addWidget(name_edit, 0, 1)
-            
-            # バイク情報
-            rider_layout.addWidget(QLabel("バイク:"), 1, 0)
-            bike_edit = QLineEdit(rider.get("bike", ""))
-            rider_layout.addWidget(bike_edit, 1, 1)
-            
-            # 色設定
-            rider_layout.addWidget(QLabel("カラー:"), 2, 0)
-            color_button = ColorButton("")
-            color_button.set_color(rider.get("color", "#1f77b4"))
-            rider_layout.addWidget(color_button, 2, 1)
-            
-            # デフォルト設定
-            default_checkbox = QCheckBox("デフォルト")
-            default_checkbox.setChecked(rider.get("default", False))
-            rider_layout.addWidget(default_checkbox, 3, 0, 1, 2)
-            
-            # 削除ボタン
-            delete_button = QPushButton("削除")
-            rider_id = rider.get("id")
-            delete_button.clicked.connect(lambda checked, rid=rider_id: self.delete_rider(rid))
-            rider_layout.addWidget(delete_button, 4, 0, 1, 2)
-            
-            # ライダー情報をレイアウトに追加
-            self.riders_layout.addWidget(rider_widget)
-            
-            # 保存用の辞書に追加
-            self.rider_editors[rider_id] = {
-                "name": name_edit,
-                "bike": bike_edit,
-                "color": color_button,
-                "default": default_checkbox
-            }
-    
-    def add_rider(self):
-        """新しいライダーを追加"""
-        # 新しいライダーデータを作成
-        new_rider = {
-            "name": "New Rider",
-            "bike": "",
-            "color": "#1f77b4",
-            "default": False
-        }
-        
-        # データベースに追加
-        rider_id = self.config_manager.add_rider(new_rider)
-        
-        # 表示を更新
-        self.populate_riders_list()
-    
-    def delete_rider(self, rider_id):
-        """ライダーを削除"""
-        # データベースから削除
-        self.config_manager.delete_rider(rider_id)
-        
-        # 表示を更新
-        self.populate_riders_list()
+        # 新しいRiderManagerWidgetを使用
+        self.rider_manager = RiderManagerWidget(self, self.config_manager)
+        return self.rider_manager
     
     def create_tires_tab(self):
         """タイヤ管理タブを作成"""
-        widget = QWidget()
-        layout = QVBoxLayout()
-        
-        # タイヤリスト用のグループボックス
-        tire_group = QGroupBox("登録済みタイヤ")
-        tire_layout = QVBoxLayout()
-        
-        # タイヤリストを表示
-        self.tires_layout = QVBoxLayout()
-        self.populate_tires_list()
-        tire_layout.addLayout(self.tires_layout)
-        
-        # 新規タイヤ追加ボタン
-        add_tire_button = QPushButton("タイヤを追加")
-        add_tire_button.clicked.connect(self.add_tire)
-        tire_layout.addWidget(add_tire_button)
-        
-        tire_group.setLayout(tire_layout)
-        layout.addWidget(tire_group)
-        
-        # タイヤ設定保存用
-        self.tire_editors = {}
-        
-        widget.setLayout(layout)
-        return widget
-    
-    def populate_tires_list(self):
-        """タイヤリストを表示"""
-        # まず既存のウィジェットをクリア
-        for i in reversed(range(self.tires_layout.count())):
-            widget = self.tires_layout.itemAt(i).widget()
-            if widget:
-                widget.setParent(None)
-        
-        # 保存用の辞書をクリア
-        self.tire_editors = {}
-        
-        # タイヤリストを取得
-        tires_list = self.config_manager.get_tires_list()
-        
-        for tire in tires_list:
-            # タイヤ情報表示用のウィジェット
-            tire_widget = QWidget()
-            tire_layout = QGridLayout()
-            tire_widget.setLayout(tire_layout)
-            
-            # タイヤ名
-            tire_layout.addWidget(QLabel("名前:"), 0, 0)
-            name_edit = QLineEdit(tire.get("name", ""))
-            tire_layout.addWidget(name_edit, 0, 1)
-            
-            # 説明
-            tire_layout.addWidget(QLabel("説明:"), 1, 0)
-            description_edit = QLineEdit(tire.get("description", ""))
-            tire_layout.addWidget(description_edit, 1, 1)
-            
-            # 色設定
-            tire_layout.addWidget(QLabel("カラー:"), 2, 0)
-            color_button = ColorButton("")
-            color_button.set_color(tire.get("color", "#000000"))
-            tire_layout.addWidget(color_button, 2, 1)
-            
-            # デフォルト設定
-            default_checkbox = QCheckBox("デフォルト")
-            default_checkbox.setChecked(tire.get("default", False))
-            tire_layout.addWidget(default_checkbox, 3, 0, 1, 2)
-            
-            # 削除ボタン
-            delete_button = QPushButton("削除")
-            tire_id = tire.get("id")
-            delete_button.clicked.connect(lambda checked, tid=tire_id: self.delete_tire(tid))
-            tire_layout.addWidget(delete_button, 4, 0, 1, 2)
-            
-            # タイヤ情報をレイアウトに追加
-            self.tires_layout.addWidget(tire_widget)
-            
-            # 保存用の辞書に追加
-            self.tire_editors[tire_id] = {
-                "name": name_edit,
-                "description": description_edit,
-                "color": color_button,
-                "default": default_checkbox
-            }
-    
-    def add_tire(self):
-        """新しいタイヤを追加"""
-        # 新しいタイヤデータを作成
-        new_tire = {
-            "name": "New Tire",
-            "description": "",
-            "color": "#000000",
-            "default": False
-        }
-        
-        # データベースに追加
-        tire_id = self.config_manager.add_tire(new_tire)
-        
-        # 表示を更新
-        self.populate_tires_list()
-    
-    def delete_tire(self, tire_id):
-        """タイヤを削除"""
-        # データベースから削除
-        self.config_manager.delete_tire(tire_id)
-        
-        # 表示を更新
-        self.populate_tires_list()
+        # 新しいTireManagerWidgetを使用
+        self.tire_manager = TireManagerWidget(self, self.config_manager)
+        return self.tire_manager
     
     def save_settings(self):
         # CSVカラム設定を保存
@@ -723,7 +803,7 @@ class SettingsDialog(QDialog):
         }
         self.config_manager.update_setting("color", "settings", color_settings)
         
-        # 統計色設定を保存
+        # 統計カラー設定を保存
         stats_color_settings = self.stats_color_settings.get_settings()
         self.config_manager.update_setting("stats_table_settings", "settings", stats_color_settings)
         
@@ -748,24 +828,22 @@ class SettingsDialog(QDialog):
         self.config_manager.update_setting("session", "settings", session_settings)
         
         # ライダー設定を保存
-        for rider_id, editor in self.rider_editors.items():
-            rider_settings = {
-                "name": editor["name"].text(),
-                "bike": editor["bike"].text(),
-                "color": editor["color"].get_color(),
-                "default": editor["default"].isChecked()
-            }
-            self.config_manager.update_rider(rider_id, rider_settings)
+        try:
+            # 新しいRiderManagerWidgetから情報を取得
+            riders_data = self.rider_manager.get_items_dict()
+            for rider_id, rider_data in riders_data.items():
+                self.config_manager.update_rider(rider_id, rider_data)
+        except Exception as e:
+            print(f"Error saving rider settings: {e}")
         
         # タイヤ設定を保存
-        for tire_id, editor in self.tire_editors.items():
-            tire_settings = {
-                "name": editor["name"].text(),
-                "description": editor["description"].text(),
-                "color": editor["color"].get_color(),
-                "default": editor["default"].isChecked()
-            }
-            self.config_manager.update_tire(tire_id, tire_settings)
+        try:
+            # 新しいTireManagerWidgetから情報を取得
+            tires_data = self.tire_manager.get_items_dict()
+            for tire_id, tire_data in tires_data.items():
+                self.config_manager.update_tire(tire_id, tire_data)
+        except Exception as e:
+            print(f"Error saving tire settings: {e}")
         
         self.config_manager.save_config()
         self.settings_updated.emit(session_settings)
