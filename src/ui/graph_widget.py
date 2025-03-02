@@ -199,9 +199,11 @@ class GraphWidget(QWidget):
         
         # 余白を設定
         if is_all_riders:
-            self.figure.subplots_adjust(right=0.85, left=0.1, top=0.92, bottom=0.10)
+            # 右側に余白を増やして凡例のスペースを確保
+            self.figure.subplots_adjust(right=0.80, left=0.1, top=0.92, bottom=0.10)
         else:
-            self.figure.subplots_adjust(right=0.95, left=0.1, top=0.92, bottom=0.10)
+            # 単一ライダーの場合も右側に余白を確保
+            self.figure.subplots_adjust(right=0.85, left=0.1, top=0.92, bottom=0.10)
 
     def _calculate_moving_average(self, data, window_size=5):
         """データ系列の移動平均を計算"""
@@ -255,7 +257,7 @@ class GraphWidget(QWidget):
                            alpha=0.7)
             # 凡例を外部に配置し、必要に応じて縮小表示
             if len(ax.get_lines()) > 0:  # プロット要素があるか確認
-                ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize='small', frameon=True)
+                ax.legend(loc='upper right', fontsize='small', frameon=True)
             title = 'Lap Time Trends - All Riders'
         else:
             # 選択されたライダーのラップタイム推移
@@ -296,9 +298,9 @@ class GraphWidget(QWidget):
             # 凡例を適切な位置に配置
             if len(ax.get_lines()) > 0:  # プロット要素があるか確認
                 if selected_rider == "All Riders":
-                    ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), fontsize='small', frameon=True)
+                    ax.legend(loc='upper right', fontsize='small', frameon=True)
                 else:
-                    ax.legend(loc='best', fontsize='small')
+                    ax.legend(loc='upper right', fontsize='small')
             title = 'Lap Time Trends'
         
         ax.set_title(title)
@@ -340,8 +342,8 @@ class GraphWidget(QWidget):
                 if not rider_data.empty:
                     lap_times = [self.time_to_seconds(t) for t in rider_data['LapTime']]
                     ax.hist(lap_times, alpha=0.5, label=rider, bins=10, density=False)
-            if len(ax.get_lines()) > 0:  # プロット要素があるか確認
-                ax.legend()
+            if len(ax.patches) > 0:  # ヒストグラムや棒グラフの要素を確認
+                ax.legend(loc='upper right', fontsize='small')
             title = 'Lap Time Distribution - All Riders'
         else:
             # 選択されたライダーのヒストグラム
@@ -393,8 +395,8 @@ class GraphWidget(QWidget):
                         has_valid_data = True  # 有効なデータがあるとマーク
             
             # 有効なデータがある場合のみ凡例を表示
-            if has_valid_data and len(ax.get_lines()) > 0:  # プロット要素があるか確認
-                ax.legend()
+            if has_valid_data and len(ax.patches) > 0:  # 棒グラフのパッチを確認
+                ax.legend(loc='upper right', fontsize='small')
             title = 'Average Sector Times - All Riders'
         else:
             # 選択されたライダーのセクタータイム比較
@@ -414,8 +416,8 @@ class GraphWidget(QWidget):
                         has_valid_bars = True
                 
                 # 凡例を表示（有効なデータがある場合のみ）
-                if has_valid_bars and len(ax.get_lines()) > 0:  # プロット要素があるか確認
-                    ax.legend(loc='best', fontsize='small')
+                if has_valid_bars and len(ax.patches) > 0:  # 棒グラフのパッチを確認
+                    ax.legend(loc='upper right', fontsize='small')
             title = f'Average Sector Times - {selected_rider}'
         
         ax.set_title(title)
@@ -499,8 +501,7 @@ class GraphWidget(QWidget):
             # 凡例配置の設定（余白調整はupdate_graphで既に設定済み）
             if len(ax.get_lines()) > 0:  # プロット要素があるか確認
                 ax.legend(legend_handles, legend_labels, 
-                     loc='center left', 
-                     bbox_to_anchor=(1.01, 0.5),  
+                     loc='upper right',
                      fontsize='xx-small',  # フォントサイズをさらに小さく
                      frameon=True,
                      ncol=2,  # 凡例を2列に
@@ -553,7 +554,7 @@ class GraphWidget(QWidget):
             
             # 凡例を適切な位置に配置
             if len(ax.get_lines()) > 0:  # プロット要素があるか確認
-                ax.legend(loc='best', fontsize='small')
+                ax.legend(loc='upper right', fontsize='small')
             title = f'Sector Time Trends - {selected_rider}'
         
         # Y軸の範囲を適切に設定
@@ -704,7 +705,7 @@ class GraphWidget(QWidget):
                                   color=rider_color if rider_color else line[0].get_color())
                     
             if len(ax.get_lines()) > 0:  # プロット要素があるか確認
-                ax.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+                ax.legend(loc='upper right', fontsize='small')
             title = 'Sector Performance - All Riders'
         else:
             # 選択されたライダーのレーダーチャート
