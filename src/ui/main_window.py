@@ -4,8 +4,8 @@ from PyQt5.QtCore import Qt
 from ui.data_input_widget import DataInputWidget
 from ui.graph_widget import GraphWidget
 from ui.graph_window import GraphWindow
-from ui.table_widget import TableWidget
-from ui.stats_table_widget import StatsTableWidget
+from ui.base_widgets.lap_data_table_widget import LapDataTableWidget
+from ui.base_widgets.statistics_table_widget import StatisticsTableWidget
 from ui.settings_dialog import SettingsDialog
 from app.analyzer import LapTimeAnalyzer
 from app.data_loader import DataLoader
@@ -57,11 +57,11 @@ class MainWindow(QMainWindow):
         splitter = QSplitter(Qt.Vertical)
         
         # 統計情報テーブル
-        self.stats_table = StatsTableWidget(self.config_manager)
+        self.stats_table = StatisticsTableWidget(self.config_manager, parent=self)
         splitter.addWidget(self.stats_table)
         
         # テーブルウィジェット
-        self.table_widget = TableWidget()
+        self.table_widget = LapDataTableWidget(parent=self)
         splitter.addWidget(self.table_widget)
         
         # スプリッターの初期サイズ比を設定（グラフ:統計:テーブル = 4:2:4）

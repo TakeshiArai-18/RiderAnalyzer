@@ -845,8 +845,9 @@ class SettingsDialog(QDialog):
         except Exception as e:
             print(f"Error saving tire settings: {e}")
         
+        # 設定の保存と更新通知
         self.config_manager.save_config()
-        self.settings_updated.emit(session_settings)
+        self.settings_updated.emit(self.config_manager.config)
         self.accept()
 
     def pick_color(self, button):
