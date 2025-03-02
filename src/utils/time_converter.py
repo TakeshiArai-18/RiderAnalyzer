@@ -96,10 +96,18 @@ class TimeConverter:
             bool: 有効な形式の場合はTrue
         """
         if not time_str or not isinstance(time_str, str):
+            print(f"Debug: Invalid time string: '{time_str}' - Not a string or empty")
             return False
 
         time_str = time_str.strip()
         if not time_str:
+            print(f"Debug: Invalid time string: Empty after stripping whitespace")
             return False
 
-        return any(re.match(pattern, time_str) for pattern in self.time_patterns)
+        # 時間形式の検証とデバッグ情報の出力
+        match_results = [re.match(pattern, time_str) for pattern in self.time_patterns]
+        if not any(match_results):
+            print(f"Debug: Invalid time format: '{time_str}' - Does not match any pattern")
+            return False
+            
+        return True

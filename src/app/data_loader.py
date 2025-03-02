@@ -56,8 +56,9 @@ class DataLoader:
                 try:
                     # 基本データの検証と変換
                     required_fields = ['Rider', 'Lap', 'LapTime', 'Sector1', 'Sector2', 'Sector3']
-                    if not all(field in lap for field in required_fields):
-                        print(f"Warning: Missing required fields in lap data at index {i}")
+                    missing_fields = [field for field in required_fields if field not in lap]
+                    if missing_fields:
+                        print(f"Warning: Missing required fields in lap data at index {i}: {', '.join(missing_fields)}")
                         continue
 
                     processed_lap = {
@@ -70,9 +71,13 @@ class DataLoader:
                     }
 
                     # タイムデータの検証
-                    if not all(self.time_converter.is_valid_time_string(processed_lap[field]) 
-                             for field in ['LapTime', 'Sector1', 'Sector2', 'Sector3']):
-                        print(f"Warning: Invalid time format in lap data at index {i}")
+                    invalid_time_fields = []
+                    for field in ['LapTime', 'Sector1', 'Sector2', 'Sector3']:
+                        if not self.time_converter.is_valid_time_string(processed_lap[field]):
+                            invalid_time_fields.append(f"{field}={processed_lap[field]}")
+                    
+                    if invalid_time_fields:
+                        print(f"Warning: Invalid time format in lap data at index {i}: {', '.join(invalid_time_fields)}")
                         continue
 
                     # コンディション情報の処理
@@ -90,7 +95,10 @@ class DataLoader:
                     continue
 
             if not processed_laps:
-                raise ValueError("No valid lap data found")
+                error_details = "Please check if:\n" \
+                               "1. The file contains valid lap data with required fields (Rider, Lap, LapTime, Sector1, Sector2, Sector3)\n" \
+                               "2. The time format is valid (e.g. 1:23.456, 83.456, 1:23, or 83)"
+                raise ValueError(f"No valid lap data found. {error_details}")
 
             return {
                 'session_info': session_info,
