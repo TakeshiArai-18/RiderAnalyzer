@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
                            QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox,
                            QComboBox, QLabel, QDialog, QLineEdit, QFormLayout, QDialogButtonBox)
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
 
 class DataInputWidget(QWidget):
@@ -134,6 +134,8 @@ class DataInputWidget(QWidget):
         # ラップ追加ダイアログを表示
         dialog = QDialog(self)
         dialog.setWindowTitle("Add Lap")
+        # ヘルプボタンを非表示にする
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         layout = QFormLayout(dialog)
         
@@ -159,6 +161,24 @@ class DataInputWidget(QWidget):
         weather = QLineEdit()
         track_temp = QLineEdit()
         
+        # 最新ラップデータを取得して自動入力
+        latest_lap = self.get_latest_lap_for_rider(default_rider)
+        if latest_lap:
+            # 既存のラップがある場合は次のラップ番号を設定
+            next_lap_number = latest_lap["Lap"] + 1
+            lap_number.setText(str(next_lap_number))
+        else:
+            # 初めてのラップの場合は1を設定
+            lap_number.setText("1")
+        
+        # セッション設定から天候と路面温度を取得
+        session_settings = self.get_current_session_settings()
+        if session_settings:
+            if "Weather" in session_settings:
+                weather.setText(session_settings["Weather"])
+            if "TrackTemp" in session_settings:
+                track_temp.setText(session_settings["TrackTemp"])
+        
         # フォームにフィールドを追加
         layout.addRow("ライダー:", rider_combo)
         layout.addRow("ラップ番号:", lap_number)
@@ -170,7 +190,7 @@ class DataInputWidget(QWidget):
         layout.addRow("天候:", weather)
         layout.addRow("路面温度:", track_temp)
         
-        # ボタン
+        # カスタムボタン（OKとキャンセルのみ）
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.accepted.connect(dialog.accept)
         buttons.rejected.connect(dialog.reject)
@@ -199,13 +219,13 @@ class DataInputWidget(QWidget):
                 self.lap_data.append(new_lap)
                 
                 # テーブルを更新（解析結果なし）
-                self.update_data(self.lap_data, None)
+                self.update_table()
                 
-                # 変更シグナルを発行
+                # データ変更シグナルを発行
                 self.data_changed.emit(self.lap_data)
                 
             except ValueError:
-                QMessageBox.warning(self, "入力エラー", "ラップ番号には整数を入力してください。")
+                QMessageBox.warning(self, "入力エラー", "ラップ番号は整数で入力してください。")
 
     def delete_data_clicked(self):
         """データを削除するボタンがクリックされたときのハンドラ"""
@@ -250,6 +270,51 @@ class DataInputWidget(QWidget):
                 elif lap == analysis_results['slowest_lap']:
                     for col in range(9):  # 列数を変更
                         self.table.item(row, col).setBackground(QColor(255, 200, 200))
+
+    def update_table(self):
+        """テーブルウィジェットを更新"""
+        self.table.setRowCount(len(self.lap_data))
+        
+        for row, lap in enumerate(self.lap_data):
+            self.table.setItem(row, 0, QTableWidgetItem(lap.get("Rider", "")))
+            self.table.setItem(row, 1, QTableWidgetItem(str(lap.get("Lap", ""))))
+            self.table.setItem(row, 2, QTableWidgetItem(lap.get("LapTime", "")))
+            self.table.setItem(row, 3, QTableWidgetItem(lap.get("Sector1", "")))
+            self.table.setItem(row, 4, QTableWidgetItem(lap.get("Sector2", "")))
+            self.table.setItem(row, 5, QTableWidgetItem(lap.get("Sector3", "")))
+            self.table.setItem(row, 6, QTableWidgetItem(lap.get("TireType", "")))
+            self.table.setItem(row, 7, QTableWidgetItem(lap.get("Weather", "")))
+            self.table.setItem(row, 8, QTableWidgetItem(lap.get("TrackTemp", "")))
+
+    def get_latest_lap_for_rider(self, rider_name):
+        """指定されたライダーの最新ラップデータを取得
+        
+        Args:
+            rider_name (str): ライダー名
+            
+        Returns:
+            dict or None: 最新ラップデータ。ラップがない場合はNone
+        """
+        rider_laps = [lap for lap in self.lap_data if lap["Rider"] == rider_name]
+        if rider_laps:
+            return max(rider_laps, key=lambda x: x["Lap"])
+        return None
+
+    def get_current_session_settings(self):
+        """現在のセッション設定を取得
+        
+        Returns:
+            dict or None: セッション設定。設定がない場合はNone
+        """
+        # config_managerからセッション設定を取得
+        if self.config_manager:
+            # 実際の実装に合わせて調整が必要かもしれません
+            return self.config_manager.get_session_settings()
+        return None
+
+    def set_data(self, data):
+        self.lap_data = data
+        self.update_table()
 
     def analyze_clicked(self):
         """解析ボタンがクリックされたときのハンドラ"""

@@ -319,3 +319,26 @@ class ConfigManager:
                     "default": False
                 }
                 self.add_rider(new_rider)
+                
+    def get_session_settings(self):
+        """現在のセッション設定を取得
+        
+        Returns:
+            dict: セッション設定。天候や路面温度などの情報を含む
+        """
+        session_data = self.get_setting("session", "settings")
+        if not session_data or not isinstance(session_data, dict):
+            # セッション設定がない場合はデフォルト値を返す
+            return {
+                "Weather": "",
+                "TrackTemp": ""
+            }
+        
+        # 条件情報を取得
+        conditions = session_data.get("conditions", {})
+        
+        # UIで使用する形式に変換して返す
+        return {
+            "Weather": conditions.get("weather", ""),
+            "TrackTemp": str(conditions.get("track_temp", ""))
+        }
