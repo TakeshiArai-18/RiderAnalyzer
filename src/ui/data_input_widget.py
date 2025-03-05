@@ -21,8 +21,6 @@ class DataInputWidget(QWidget):
         button_layout = QHBoxLayout()
 
         # データ操作ボタン
-        self.load_json_button = QPushButton('Load JSON')
-        self.load_csv_button = QPushButton('Load CSV')
         self.add_lap_button = QPushButton('Add Lap')
         self.delete_data_button = QPushButton('Delete Data')
 
@@ -32,14 +30,10 @@ class DataInputWidget(QWidget):
         self.analyze_button.clicked.connect(self.analyze_clicked)
 
         # ボタンの接続
-        self.load_json_button.clicked.connect(self.load_json_clicked)
-        self.load_csv_button.clicked.connect(self.load_csv_clicked)
         self.add_lap_button.clicked.connect(self.add_lap_clicked)
         self.delete_data_button.clicked.connect(self.delete_data_clicked)
 
         # ボタンをレイアウトに追加
-        button_layout.addWidget(self.load_json_button)
-        button_layout.addWidget(self.load_csv_button)
         button_layout.addWidget(self.add_lap_button)
         button_layout.addWidget(self.delete_data_button)
         button_layout.addWidget(self.analyze_button)

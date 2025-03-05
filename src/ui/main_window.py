@@ -19,6 +19,9 @@ class MainWindow(QMainWindow):
         # 設定マネージャーの初期化
         self.config_manager = ConfigManager()
         
+        # 解析モードフラグを追加
+        self.analysis_mode = False
+        
         # 以前の形式からの移行確認
         self.config_manager.migrate_to_new_format()
         
@@ -47,10 +50,6 @@ class MainWindow(QMainWindow):
         self.data_input = DataInputWidget(config_manager=self.config_manager)
         self.data_input.data_changed.connect(self.on_data_changed)
         self.data_input.analyze_requested.connect(self.on_analyze_requested)  # 新しい接続
-        
-        # ボタンのイベントを接続
-        self.data_input.load_json_button.clicked.connect(self.open_json_file)
-        self.data_input.load_csv_button.clicked.connect(self.open_csv_file)
         
         layout.addWidget(self.data_input)
         
@@ -156,10 +155,13 @@ class MainWindow(QMainWindow):
             if not data or 'lap_data' not in data:
                 return
 
+            # 解析モードをリセット
+            self.analysis_mode = False
+
             # 解析なしで各ウィジェットを更新
             self.data_input.update_data(data['lap_data'], None)
             self.table_widget.update_data(data['lap_data'], None)
-            self.graph_window.update_data(data['lap_data'], None)
+            # グラフ更新は行わない
             
             # 解析が必要な旨を通知
             QMessageBox.information(self, "Information", "Data loaded. Click 'Analyze Data' to perform analysis.")
@@ -173,9 +175,15 @@ class MainWindow(QMainWindow):
             if not data:
                 return
             
+            # データが変更されたら解析モードをOFFに
+            self.analysis_mode = False
+            
             # 解析なしでテーブルデータのみ更新
             self.table_widget.update_data(data, None)
-            self.graph_window.update_data(data, None)
+            # グラフは更新しない
+            
+            # 解析が必要であることを通知
+            self.statusBar().showMessage("データが変更されました。解析するには'Analyze Data'ボタンをクリックしてください。", 5000)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to update data: {str(e)}")
 
@@ -185,12 +193,16 @@ class MainWindow(QMainWindow):
             return
         
         try:
+            # 解析モードをONに
+            self.analysis_mode = True
+            
             # 分析結果を取得
             analysis_results = self.analyzer.analyze_laps(data)
             
             # 各ウィジェットに分析結果を反映
             self.table_widget.update_data(data, analysis_results)
             self.graph_window.update_data(data, analysis_results)
+            self.graph_window.show()  # グラフウィンドウを表示
             
             # 移動平均統計の計算
             moving_stats = self.analyzer.calculate_moving_statistics(data)

@@ -18,6 +18,10 @@ class GraphWidget(QWidget):
         self.time_converter = TimeConverter()
         self.data = None
         
+        # 日本語フォント設定
+        plt.rcParams['font.family'] = ['Yu Gothic', 'Meiryo', 'MS Gothic', 'sans-serif']  
+        # Windows日本語フォントを優先的に使用、フォールバックとしてsans-serifを指定
+        
         # ウィジェットのサイズポリシーを設定
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
