@@ -86,7 +86,7 @@ class DataLoader:
                         processed_lap.update({
                             'TireType': str(conditions.get('tire', '')),
                             'Weather': str(conditions.get('weather', '')),
-                            'TrackTemp': conditions.get('track_temp', '')
+                            'TrackTemp': str(conditions.get('track_temp', ''))
                         })
 
                     processed_laps.append(processed_lap)
@@ -172,3 +172,71 @@ class DataLoader:
             df.to_csv(file_path, index=False)
         except Exception as e:
             raise ValueError(f"Failed to save CSV file: {str(e)}")
+
+    def _format_data_for_json(self, data: List) -> List:
+        """ラップデータをJSON形式用に整形する
+        
+        Args:
+            data (List): ラップデータのリスト
+            
+        Returns:
+            List: JSON形式用に整形されたデータ
+            
+        Raises:
+            ValueError: データの形式が不正な場合
+        """
+        try:
+            if not isinstance(data, list):
+                raise ValueError("Invalid data format: expected a list of lap data")
+                
+            formatted_data = []
+            
+            for i, lap in enumerate(data):
+                try:
+                    if not isinstance(lap, dict):
+                        print(f"Warning: Invalid lap data at index {i}: not a dictionary")
+                        continue
+                        
+                    # 必須フィールドの検証
+                    required_fields = ['Rider', 'Lap', 'LapTime', 'Sector1', 'Sector2', 'Sector3']
+                    missing_fields = [field for field in required_fields if field not in lap]
+                    if missing_fields:
+                        print(f"Warning: Missing required fields in lap data at index {i}: {', '.join(missing_fields)}")
+                        continue
+                        
+                    # タイムデータの検証
+                    invalid_time_fields = []
+                    for field in ['LapTime', 'Sector1', 'Sector2', 'Sector3']:
+                        if not self.time_converter.is_valid_time_string(lap[field]):
+                            invalid_time_fields.append(f"{field}={lap[field]}")
+                    
+                    if invalid_time_fields:
+                        print(f"Warning: Invalid time format in lap data at index {i}: {', '.join(invalid_time_fields)}")
+                        continue
+                    
+                    # サンプル形式に合わせてデータを変換
+                    formatted_lap = {
+                        "Rider": lap['Rider'],
+                        "Lap": lap['Lap'],
+                        "LapTime": lap['LapTime'],
+                        "Sector1": lap['Sector1'],
+                        "Sector2": lap['Sector2'],
+                        "Sector3": lap['Sector3'],
+                        "conditions": {
+                            "tire": str(lap.get('TireType', '')),
+                            "weather": str(lap.get('Weather', '')),
+                            "track_temp": str(lap.get('TrackTemp', ''))
+                        }
+                    }
+                    
+                    formatted_data.append(formatted_lap)
+                except (ValueError, TypeError) as e:
+                    print(f"Warning: Error processing lap data at index {i}: {str(e)}")
+                    continue
+            
+            if not formatted_data:
+                raise ValueError("No valid lap data could be formatted for JSON output")
+                
+            return formatted_data
+        except Exception as e:
+            raise ValueError(f"Failed to format data for JSON: {str(e)}")

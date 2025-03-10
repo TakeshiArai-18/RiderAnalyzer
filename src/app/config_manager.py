@@ -324,21 +324,41 @@ class ConfigManager:
         """現在のセッション設定を取得
         
         Returns:
-            dict: セッション設定。天候や路面温度などの情報を含む
+            dict: セッション設定。トラック、日付、セッションタイプ、天候、路面温度などの情報を含む
         """
         session_data = self.get_setting("session", "settings")
+        print(f"Debug - Config Manager - Raw session data: {session_data}")
+        
         if not session_data or not isinstance(session_data, dict):
             # セッション設定がない場合はデフォルト値を返す
             return {
+                "track": "Unknown Track",
+                "date": "",
+                "session_type": "Practice",
                 "Weather": "",
                 "TrackTemp": ""
             }
         
-        # 条件情報を取得
+        # トラック名に値がないかチェック
+        track = session_data.get("track", "Unknown Track")
+        if not track or track.strip() == "":
+            track = "Unknown Track"
+            
+        # 日付に値がないかチェック
+        date = session_data.get("date", "")
+        if not date or date.strip() == "":
+            date = ""
+        
+        # 条件情報とセッション基本情報を取得
         conditions = session_data.get("conditions", {})
         
-        # UIで使用する形式に変換して返す
-        return {
+        result = {
+            "track": track,
+            "date": date,
+            "session_type": session_data.get("session_type", "Practice"),
             "Weather": conditions.get("weather", ""),
             "TrackTemp": str(conditions.get("track_temp", ""))
         }
+        
+        print(f"Debug - Config Manager - Processed session data: {result}")
+        return result

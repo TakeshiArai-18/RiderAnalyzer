@@ -33,7 +33,7 @@ class SessionSettingsWidget(BaseSettingsWidget):
         circuit_layout.addWidget(QLabel("サーキット:"))
         self.circuit_name = QLineEdit()
         if current_session and isinstance(current_session, dict):
-            self.circuit_name.setText(current_session.get("session", {}).get("circuit", ""))
+            self.circuit_name.setText(current_session.get("track", ""))
         circuit_layout.addWidget(self.circuit_name)
         session_layout.addLayout(circuit_layout)
         
@@ -43,9 +43,21 @@ class SessionSettingsWidget(BaseSettingsWidget):
         self.session_date = QLineEdit()
         self.session_date.setPlaceholderText("YYYY-MM-DD")
         if current_session and isinstance(current_session, dict):
-            self.session_date.setText(current_session.get("session", {}).get("date", ""))
+            self.session_date.setText(current_session.get("date", ""))
         date_layout.addWidget(self.session_date)
         session_layout.addLayout(date_layout)
+        
+        # セッションタイプ
+        session_type_layout = QHBoxLayout()
+        session_type_layout.addWidget(QLabel("セッションタイプ:"))
+        self.session_type_combo = QComboBox()
+        self.session_type_combo.addItems(["Practice", "Qualifying", "Race", "Test"])
+        if current_session and isinstance(current_session, dict):
+            current_type = current_session.get("session_type", "Practice")
+            if current_type:
+                self.session_type_combo.setCurrentText(current_type)
+        session_type_layout.addWidget(self.session_type_combo)
+        session_layout.addLayout(session_type_layout)
         
         session_group.setLayout(session_layout)
         layout.addWidget(session_group)
@@ -109,12 +121,23 @@ class SessionSettingsWidget(BaseSettingsWidget):
     
     def save_settings(self):
         """セッション設定を保存"""
+        # トラック名に値がないかチェック
+        circuit_name = self.circuit_name.text()
+        if not circuit_name or circuit_name.strip() == "":
+            circuit_name = "Unknown Track"
+
+        # 日付に値がないかチェック
+        session_date = self.session_date.text()
+        if not session_date or session_date.strip() == "":
+            session_date = ""
+
         session_settings = {
             "session": {
-                "name": self.session_name.text() or "Default Session",
-                "circuit": self.circuit_name.text() or "Default Circuit",
-                "date": self.session_date.text() or ""
+                "name": self.session_name.text() or "Default Session"
             },
+            "track": circuit_name,
+            "date": session_date,
+            "session_type": self.session_type_combo.currentText() or "Practice",
             "conditions": {
                 "tire": self.tire_combo.currentText(),
                 "weather": self.weather_combo.currentText(),
@@ -122,4 +145,6 @@ class SessionSettingsWidget(BaseSettingsWidget):
                 "track_temp": self.track_temp.value()
             }
         }
+        
+        print(f"Debug - Saving session settings: {session_settings}")
         self.config_manager.update_setting("session", "settings", session_settings)

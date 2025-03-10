@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         
     def initUI(self):
         """UIの初期化"""
-        self.setWindowTitle('RiderCal')
+        self.setWindowTitle('RiderAnalyzer')
         self.setGeometry(100, 100, 1200, 800)
         
         # メインウィジェットとレイアウト
@@ -91,6 +91,11 @@ class MainWindow(QMainWindow):
         # CSVを開く
         open_csv_action = file_menu.addAction('Open CSV')
         open_csv_action.triggered.connect(self.open_csv_file)
+        
+        # ファイルを保存
+        save_action = file_menu.addAction('Save')
+        save_action.triggered.connect(self.save_data_file)
+        save_action.setShortcut('Ctrl+S')
         
         # 終了
         exit_action = file_menu.addAction('Exit')
@@ -286,3 +291,103 @@ class MainWindow(QMainWindow):
             '<li>タイヤタイプ、天候、路面温度などの走行条件も記録可能</li>'
             '</ul>'
         )
+
+    def save_data_file(self):
+        """ファイルを保存する"""
+        # データ入力ウィジェットからデータを取得
+        data = self.data_input.lap_data
+        
+        if not data:
+            QMessageBox.warning(self, "警告", "保存するデータがありません。")
+            return
+            
+        # 保存ファイル名を取得
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, 'ファイルを保存', '', 'データファイル (*)'
+        )
+        
+        if not file_path:
+            return  # ユーザーがキャンセルした場合
+            
+        # ファイル名から拡張子を除去（両方の形式で使用するため）
+        file_base = file_path.rsplit('.', 1)[0] if '.' in file_path else file_path
+        
+        try:
+            # セッション情報を取得
+            session_info = self.config_manager.get_session_settings()
+            print(f"Debug - Session Info: {session_info}")
+            
+            # JSONファイルとして保存
+            json_file_path = file_base + '.json'
+            json_saved = self.save_as_json(data, json_file_path, session_info)
+            
+            # CSVファイルとして保存 - セッション情報に基づいてファイル名を変更
+            track = session_info.get('track', '')
+            date = session_info.get('date', '')
+            print(f"Debug - Track: '{track}', Date: '{date}'")
+            
+            # トラック名と日付があれば付加する
+            if track and date:
+                # スペースをアンダースコアに置換
+                track_formatted = track.replace(' ', '_')
+                # ハイフンを除去
+                date_formatted = date.replace('-', '')
+                csv_file_name = f"{file_base}_{track_formatted}_{date_formatted}.csv"
+            else:
+                csv_file_name = f"{file_base}.csv"
+                
+            print(f"Debug - CSV Filename: {csv_file_name}")
+            csv_saved = self.save_as_csv(data, csv_file_name)
+            
+            if json_saved and csv_saved:
+                QMessageBox.information(
+                    self, 
+                    "情報", 
+                    f"データを保存しました。\nJSON: {json_file_path}\nCSV: {csv_file_name}"
+                )
+            elif json_saved:
+                QMessageBox.information(
+                    self, 
+                    "情報", 
+                    f"JSONデータのみ保存しました。\nJSON: {json_file_path}"
+                )
+            elif csv_saved:
+                QMessageBox.information(
+                    self, 
+                    "情報", 
+                    f"CSVデータのみ保存しました。\nCSV: {csv_file_name}"
+                )
+        except Exception as e:
+            print(f"Error saving data: {str(e)}")
+            QMessageBox.critical(self, "エラー", f"データの保存に失敗しました: {str(e)}")
+            
+    def save_as_json(self, data, file_path, session_info=None):
+        """データをJSON形式で保存"""
+        try:
+            # データをDataLoaderを使って保存
+            formatted_data = {
+                "session_info": session_info or {},
+                "lap_data": self.data_loader._format_data_for_json(data)
+            }
+            
+            # ファイルに保存
+            self.data_loader.save_json(file_path, formatted_data)
+            return True
+        except ValueError as e:
+            QMessageBox.critical(self, "エラー", f"JSONファイルの保存に失敗しました: {str(e)}")
+            return False
+        
+    def save_as_csv(self, data, file_path):
+        """データをCSV形式で保存"""
+        try:
+            # データをCSV形式に整形
+            formatted_data = {
+                'lap_data': data  # データローダーがこの形式を期待
+            }
+            
+            # ファイルに保存
+            self.data_loader.save_csv(file_path, formatted_data)
+        except ValueError as e:
+            QMessageBox.critical(self, "エラー", f"CSVファイルの保存に失敗しました: {str(e)}")
+            return False
+        return True

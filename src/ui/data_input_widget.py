@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
                            QComboBox, QLabel, QDialog, QLineEdit, QFormLayout, QDialogButtonBox)
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QColor
+from utils.time_converter import TimeConverter
 
 class DataInputWidget(QWidget):
     data_changed = pyqtSignal(list)  # データが変更されたときのシグナル
@@ -12,6 +13,7 @@ class DataInputWidget(QWidget):
         super().__init__(parent)
         self.lap_data = []
         self.config_manager = config_manager
+        self.time_converter = TimeConverter()  # タイム変換・検証用
         self.initUI()
 
     def initUI(self):
@@ -144,9 +146,13 @@ class DataInputWidget(QWidget):
         
         lap_number = QLineEdit()
         lap_time = QLineEdit()
+        lap_time.setPlaceholderText("mm:ss.fff")
         sector1 = QLineEdit()
+        sector1.setPlaceholderText("ss.fff")
         sector2 = QLineEdit()
+        sector2.setPlaceholderText("ss.fff")
         sector3 = QLineEdit()
+        sector3.setPlaceholderText("ss.fff")
         
         tire_combo = QComboBox()
         tire_combo.addItems([tire.get("name", "") for tire in self.config_manager.get_tires_list()])
@@ -194,20 +200,77 @@ class DataInputWidget(QWidget):
         result = dialog.exec_()
         
         if result == QDialog.Accepted:
+            # データの検証
+            validation_errors = []
+            
+            # ライダー名の検証
+            if not rider_combo.currentText():
+                validation_errors.append("ライダー名は必須です")
+            
+            # ラップ番号の検証
             try:
-                # 入力データの検証
                 lap_num = int(lap_number.text())
+                if lap_num <= 0:
+                    validation_errors.append("ラップ番号は正の整数を入力してください")
+            except ValueError:
+                validation_errors.append("ラップ番号は整数で入力してください")
+                
+            # ラップタイムの検証
+            lap_time_str = lap_time.text().strip()
+            if not lap_time_str:
+                validation_errors.append("ラップタイムは必須です")
+            elif not self.time_converter.is_valid_time_string(lap_time_str):
+                validation_errors.append("ラップタイムは有効な形式で入力してください (例: 1:23.456)")
+                
+            # セクタータイムの検証
+            for i, sector_time in enumerate([sector1.text().strip(), sector2.text().strip(), sector3.text().strip()], 1):
+                if not sector_time:
+                    validation_errors.append(f"セクター{i}タイムは必須です")
+                elif not self.time_converter.is_valid_time_string(sector_time):
+                    validation_errors.append(f"セクター{i}タイムは有効な形式で入力してください (例: 23.456)")
+            
+            # 検証エラーがある場合はメッセージを表示して処理を中断
+            if validation_errors:
+                error_message = "以下のエラーを修正してください:\n• " + "\n• ".join(validation_errors)
+                QMessageBox.warning(self, "入力エラー", error_message)
+                # ダイアログを再表示
+                self.add_lap_clicked()
+                return
+                
+            try:
+                # データの作成
                 new_lap = {
                     "Rider": rider_combo.currentText(),
                     "Lap": lap_num,
-                    "LapTime": lap_time.text(),
-                    "Sector1": sector1.text(),
-                    "Sector2": sector2.text(),
-                    "Sector3": sector3.text(),
+                    "LapTime": lap_time_str,
+                    "Sector1": sector1.text().strip(),
+                    "Sector2": sector2.text().strip(),
+                    "Sector3": sector3.text().strip(),
                     "TireType": tire_combo.currentText(),
-                    "Weather": weather.text(),
-                    "TrackTemp": track_temp.text()
+                    "Weather": weather.text().strip(),
+                    "TrackTemp": track_temp.text().strip()
                 }
+                
+                # セクタータイムの合計がラップタイムと一致するか確認（警告のみ）
+                lap_time_ms = self.time_converter.time_string_to_milliseconds(lap_time_str)
+                sector_total_ms = (
+                    self.time_converter.time_string_to_milliseconds(sector1.text().strip()) +
+                    self.time_converter.time_string_to_milliseconds(sector2.text().strip()) +
+                    self.time_converter.time_string_to_milliseconds(sector3.text().strip())
+                )
+                
+                # 許容誤差 (10ミリ秒)
+                if abs(lap_time_ms - sector_total_ms) > 10:
+                    discrepancy = abs(lap_time_ms - sector_total_ms) / 1000.0  # 秒単位に変換
+                    warning = f"セクタータイムの合計とラップタイムに{discrepancy:.3f}秒の差異があります。\n" \
+                              f"それでもこのデータを追加しますか？"
+                    reply = QMessageBox.question(self, '確認', warning,
+                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                    
+                    if reply == QMessageBox.No:
+                        # ダイアログを再表示
+                        self.add_lap_clicked()
+                        return
                 
                 # ラップデータに追加
                 self.lap_data.append(new_lap)
@@ -218,8 +281,10 @@ class DataInputWidget(QWidget):
                 # データ変更シグナルを発行
                 self.data_changed.emit(self.lap_data)
                 
-            except ValueError:
-                QMessageBox.warning(self, "入力エラー", "ラップ番号は整数で入力してください。")
+            except Exception as e:
+                print(f"エラー: {str(e)}")
+                QMessageBox.warning(self, "エラー", f"データの追加中にエラーが発生しました: {str(e)}")
+                
 
     def delete_data_clicked(self):
         """データを削除するボタンがクリックされたときのハンドラ"""
@@ -270,15 +335,20 @@ class DataInputWidget(QWidget):
         self.table.setRowCount(len(self.lap_data))
         
         for row, lap in enumerate(self.lap_data):
-            self.table.setItem(row, 0, QTableWidgetItem(lap.get("Rider", "")))
-            self.table.setItem(row, 1, QTableWidgetItem(str(lap.get("Lap", ""))))
-            self.table.setItem(row, 2, QTableWidgetItem(lap.get("LapTime", "")))
-            self.table.setItem(row, 3, QTableWidgetItem(lap.get("Sector1", "")))
-            self.table.setItem(row, 4, QTableWidgetItem(lap.get("Sector2", "")))
-            self.table.setItem(row, 5, QTableWidgetItem(lap.get("Sector3", "")))
-            self.table.setItem(row, 6, QTableWidgetItem(lap.get("TireType", "")))
-            self.table.setItem(row, 7, QTableWidgetItem(lap.get("Weather", "")))
-            self.table.setItem(row, 8, QTableWidgetItem(lap.get("TrackTemp", "")))
+            try:
+                self.table.setItem(row, 0, QTableWidgetItem(str(lap.get("Rider", ""))))
+                self.table.setItem(row, 1, QTableWidgetItem(str(lap.get("Lap", ""))))
+                self.table.setItem(row, 2, QTableWidgetItem(str(lap.get("LapTime", ""))))
+                self.table.setItem(row, 3, QTableWidgetItem(str(lap.get("Sector1", ""))))
+                self.table.setItem(row, 4, QTableWidgetItem(str(lap.get("Sector2", ""))))
+                self.table.setItem(row, 5, QTableWidgetItem(str(lap.get("Sector3", ""))))
+                self.table.setItem(row, 6, QTableWidgetItem(str(lap.get("TireType", ""))))
+                self.table.setItem(row, 7, QTableWidgetItem(str(lap.get("Weather", ""))))
+                self.table.setItem(row, 8, QTableWidgetItem(str(lap.get("TrackTemp", ""))))
+            except Exception as e:
+                print(f"テーブル更新エラー (行 {row}): {str(e)}")
+                print(f"問題のデータ: {lap}")
+                # エラーが発生しても処理を続行
 
     def get_latest_lap_for_rider(self, rider_name):
         """指定されたライダーの最新ラップデータを取得

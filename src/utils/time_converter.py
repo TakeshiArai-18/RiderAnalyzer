@@ -111,3 +111,19 @@ class TimeConverter:
             return False
             
         return True
+        
+    def time_string_to_milliseconds(self, time_str: str) -> int:
+        """時間文字列をミリ秒に変換する
+        
+        Args:
+            time_str (str): 変換する時間文字列
+            
+        Returns:
+            int: ミリ秒
+            
+        Raises:
+            ValueError: 無効な時間形式の場合
+        """
+        # 秒に変換してから1000倍してミリ秒に変換
+        seconds = self.string_to_seconds(time_str)
+        return int(seconds * 1000)

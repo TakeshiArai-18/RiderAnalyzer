@@ -37,13 +37,13 @@
         "settings": {
             "time_stats": {
                 "enabled": true,
-                "fastest": "#c8ffc8",
-                "slowest": "#ffc8c8"
+                "fastest": "#C8FFC8",
+                "slowest": "#FFC8C8"
             },
             "std_dev_stats": {
                 "enabled": true,
-                "highest": "#ffe8c8",
-                "lowest": "#c8e8ff"
+                "highest": "#FFE8C8",
+                "lowest": "#C8E8FF"
             }
         }
     },
@@ -72,14 +72,14 @@
             },
             {
                 "name": "\u30df\u30c7\u30a3\u30a2\u30e0",
-                "description": "\u30df\u30c7\u30a3\u30a2\u30e0\u30b3\u30f3\u30d1\u30a6\u30f3\u30c9",
+                "description": "\u30df\u30c7\u30a3\u30a2\u30e0\u30b3\u30f3\u30d1\u30a6\u30f9\u30c9",
                 "color": "#ffff00",
                 "default": false,
                 "id": "tire2"
             },
             {
                 "name": "\u30cf\u30fc\u30c9",
-                "description": "\u30cf\u30fc\u30c9\u30b3\u30f3\u30d1\u30a6\u30f3\u30c9",
+                "description": "\u30cf\u30fc\u30c9\u30b3\u30f3\u30d1\u30a6\u30f9\u30c9",
                 "color": "#c0c0c0",
                 "default": false,
                 "id": "tire3"
@@ -124,13 +124,9 @@
     "session": {
         "settings": {
             "session": {
-                "name": "\u3082\u3066\u304e\u516c\u958b\u7df4\u7fd21",
-                "circuit": "\u3082\u3066\u304d",
+                "name": "\u3082\u3067\u304e\u516c\u958b\u7df4\u7fd21",
+                "circuit": "\u3082\u3067\u304d",
                 "date": "20250314"
-            },
-            "rider": {
-                "name": "\u85e4\u7530",
-                "bike": "MUSHMANS2025"
             },
             "conditions": {
                 "tire": "\u30bd\u30d5\u30c8",

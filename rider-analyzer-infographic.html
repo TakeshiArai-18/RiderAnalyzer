@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiderAnalyzer取扱説明書 - グラフィックレコーディング</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kaisei+Decol&family=Yomogi&family=Zen+Kurenaido&display=swap');
+        
+        :root {
+            --fashion-1: #593C47;
+            --fashion-2: #F2E63D;
+            --fashion-3: #F2C53D;
+            --fashion-4: #F25C05;
+            --fashion-5: #F24405;
+            --text-main: #334155;
+            --text-heading: #1e40af;
+            --text-subtitle: #475569;
+            --bg-color: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Zen Kurenaido', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.4;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--fashion-3);
+            padding-bottom: 15px;
+            position: relative;
+        }
+        
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--fashion-5), var(--fashion-3), var(--fashion-2));
+        }
+        
+        .title {
+            font-family: 'Kaisei Decol', serif;
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--fashion-1), var(--fashion-5));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .title::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--fashion-4), var(--fashion-2));
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-subtitle);
+            margin-top: 5px;
+        }
+        
+        .date {
+            font-family: 'Yomogi', cursive;
+            font-size: 14px;
+            color: var(--text-subtitle);
+            text-align: right;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .column {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 12px;
+            border: 2px dashed rgba(89, 60, 71, 0.2);
+            pointer-events: none;
+        }
+        
+        .card-title {
+            font-family: 'Kaisei Decol', serif;
+            font-size: 18px;
+            color: var(--text-heading);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px dotted var(--fashion-3);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title svg {
+            margin-right: 8px;
+        }
+        
+        .card-content {
+            font-size: 14px;
+            color: var(--text-main);
+        }
+        
+        ul.handwritten-list {
+            list-style-type: none;
+            padding-left: 5px;
+        }
+        
+        ul.handwritten-list li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        ul.handwritten-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--fashion-4);
+            font-weight: bold;
+        }
+        
+        .keyword {
+            font-family: 'Yomogi', cursive;
+            font-weight: bold;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight-1 {
+            background: linear-gradient(transparent 60%, var(--fashion-2) 60%);
+        }
+        
+        .highlight-2 {
+            background: linear-gradient(transparent 60%, var(--fashion-3) 60%);
+        }
+        
+        .highlight-3 {
+            background: linear-gradient(transparent 60%, var(--fashion-4) 60%);
+        }
+        
+        .arrow-container {
+            position: relative;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .arrow-down {
+            width: 30px;
+            height: 30px;
+            margin: 0 auto;
+        }
+        
+        .note {
+            background-color: rgba(242, 230, 60, 0.1);
+            border-left: 3px solid var(--fashion-3);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Yomogi', cursive;
+        }
+        
+        .installation-steps {
+            counter-reset: step;
+        }
+        
+        .installation-step {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .installation-step::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
+            background-color: var(--fashion-3);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Kaisei Decol', serif;
+        }
+        
+        .code-block {
+            background-color: #f5f5f5;
+            border-left: 3px solid var(--fashion-1);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+            position: relative;
+        }
+        
+        .bubble {
+            position: relative;
+            background-color: white;
+            border: 2px solid var(--fashion-1);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
+        
+        .bubble::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            border-width: 0 10px 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent var(--fashion-1) transparent;
+        }
+        
+        .bubble::after {
+            content: "";
+            position: absolute;
+            top: -7px;
+            left: 22px;
+            border-width: 0 8px 8px 8px;
+            border-style: solid;
+            border-color: transparent transparent white transparent;
+        }
+        
+        .version-tag {
+            display: inline-block;
+            background-color: var(--fashion-1);
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-subtitle);
+            padding-top: 10px;
+            border-top: 1px solid var(--fashion-3);
+        }
+        
+        /* フレキシブルイメージグリッド */
+        .image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .image-grid-item {
+            flex: 1;
+            min-width: 120px;
+            background-color: rgba(242, 196, 60, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .image-grid-item svg {
+            max-width: 60px;
+            height: auto;
+            margin-bottom: 8px;
+        }
+        
+        .graph-type {
+            text-align: center;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            background-color: rgba(242, 91, 4, 0.1);
+            border: 1px dashed var(--fashion-4);
+        }
+        
+        .graph-type-title {
+            font-weight: bold;
+            color: var(--fashion-5);
+            margin-bottom: 5px;
+        }
+        
+        /* レスポンシブデザイン */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .column {
+                flex: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 class="title">RiderAnalyzer 取扱説明書</h1>
+                <p class="subtitle">ライダーのラップタイムデータを分析・可視化するソフトウェア</p>
+            </div>
+            <div class="date">2025年版</div>
+        </div>
+        
+        <div class="content">
+            <!-- 左カラム -->
+            <div class="column">
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z" fill="#1e40af"/>
+                        </svg>
+                        概要
+                    </h2>
+                    <div class="card-content">
+                        <p>RiderAnalyzerは、<span class="keyword highlight-1">ライダーのラップタイムデータ</span>を分析・可視化するためのソフトウェアです。レース中や練習走行中の<span class="keyword highlight-2">ラップタイム</span>や<span class="keyword highlight-2">セクタータイム</span>を詳細に分析し、ライダーの<span class="keyword highlight-3">パフォーマンスを向上</span>させるための洞察を提供します。</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19.0001 3H5.00006C3.90006 3 3.00006 3.9 3.00006 5V19C3.00006 20.1 3.90006 21 5.00006 21H19.0001C20.1001 21 21.0001 20.1 21.0001 19V5C21.0001 3.9 20.1001 3 19.0001 3ZM19.0001 19H5.00006V5H19.0001V19ZM7.00006 10H9.00006V17H7.00006V10ZM11.0001 7H13.0001V17H11.0001V7ZM15.0001 13H17.0001V17H15.0001V13Z" fill="#1e40af"/>
+                        </svg>
+                        主な機能
+                    </h2>
+                    <div class="card-content">
+                        <ul class="handwritten-list">
+                            <li>ラップタイムとセクタータイムの記録と分析</li>
+                            <li>複数ライダーのパフォーマンス比較</li>
+                            <li>グラフによる視覚化（ラップタイム推移、セクタータイム比較など）</li>
+                            <li>JSON形式およびCSV形式のデータの読み込みと保存</li>
+                            <li>タイヤタイプ、天候、路面温度などの走行条件の記録</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.4 16.6L4.8 12l-1.4 1.4 6 6 12-12-1.4-1.4L9.4 16.6z" fill="#1e40af"/>
+                        </svg>
+                        インストールと起動方法
+                    </h2>
+                    <div class="card-content">
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 10px;">3.1 インストール</h3>
+                        <div class="installation-steps">
+                            <div class="installation-step">
+                                リポジトリをクローンします：
+                                <div class="code-block">git clone https://github.com/TakeshiArai-18/RiderAnalyzer.git</div>
+                            </div>
+                            <div class="installation-step">
+                                クローンしたディレクトリに移動します：
+                                <div class="code-block">cd RiderAnalyzer</div>
+                            </div>
+                            <div class="installation-step">
+                                <code>scripts</code>ディレクトリに移動します：
+                                <div class="code-block">cd scripts</div>
+                            </div>
+                            <div class="installation-step">
+                                仮想環境を作成し、必要なライブラリをインストールします：
+                                <div class="code-block">create_venv.bat</div>
+                            </div>
+                        </div>
+                        
+                        <div class="bubble">
+                            <strong>バッチファイルの処理内容</strong>：
+                            <ul class="handwritten-list">
+                                <li>Python仮想環境（venv）を作成</li>
+                                <li>仮想環境を有効化</li>
+                                <li>pipをアップグレード</li>
+                                <li>requirements.txtに記載された必要なライブラリをインストール</li>
+                            </ul>
+                        </div>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">3.2 起動方法</h3>
+                        <p>アプリケーションを起動するには、<code>scripts</code>ディレクトリから次のコマンドを実行します：</p>
+                        <div class="code-block">run_app.bat</div>
+                        
+                        <div class="note">
+                            <strong>Note:</strong> バッチファイルは仮想環境を有効化し、PYTHONPATHを設定して<code>src/main.py</code>を実行します。
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 中央カラム -->
+            <div class="column">
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 19H11V17H13V19ZM15.07 11.25L14.17 12.17C13.45 12.9 13 13.5 13 15H11V14.5C11 13.4 11.45 12.4 12.17 11.67L13.41 10.41C13.78 10.05 14 9.55 14 9C14 7.9 13.1 7 12 7C10.9 7 10 7.9 10 9H8C8 6.79 9.79 5 12 5C14.21 5 16 6.79 16 9C16 9.88 15.64 10.68 15.07 11.25Z" fill="#1e40af"/>
+                        </svg>
+                        基本的な使い方
+                    </h2>
+                    <div class="card-content">
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 10px;">4.1 アプリケーションの起動</h3>
+                        <p><code>scripts</code>ディレクトリにある<code>run_app.bat</code>をダブルクリックするか、コマンドプロンプトから実行します。</p>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">4.2 サンプルデータの生成</h3>
+                        <p>テスト用のサンプルデータを生成するには次のコマンドを実行します：</p>
+                        <div class="code-block">python generate_sample_data.py</div>
+                        <p>これにより、<code>data/sample_data.json</code>に3人のライダー（A、B、C）の模擬ラップデータが生成されます。</p>
+                        
+                        <div class="image-grid">
+                            <div class="image-grid-item">
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM7 10H9V17H7V10ZM11 7H13V17H11V7ZM15 13H17V17H15V13Z" fill="#F25C05"/>
+                                </svg>
+                                <div>ライダーA<br>安定した速いラップタイム</div>
+                            </div>
+                            <div class="image-grid-item">
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM7 10H9V17H7V10ZM11 7H13V17H11V7ZM15 13H17V17H15V13Z" fill="#F2C53D"/>
+                                </svg>
+                                <div>ライダーB<br>不安定だが時々速いラップタイム</div>
+                            </div>
+                            <div class="image-grid-item">
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM7 10H9V17H7V10ZM11 7H13V17H11V7ZM15 13H17V17H15V13Z" fill="#593C47"/>
+                                </svg>
+                                <div>ライダーC<br>徐々に向上するラップタイム</div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">4.3 データの読み込み</h3>
+                        <p>メニューの「File」から「Open JSON」または「Open CSV」を選択し、データファイルを選択します。データが読み込まれると、「情報」ダイアログが表示されます。</p>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">4.4 データの入力・編集</h3>
+                        <p>データ入力ウィジェットでライダー、ラップ番号、ラップタイム、セクタータイムを入力して「Add Lap」ボタンをクリックします。タイヤタイプ、天候、路面温度などの走行条件も記録できます。</p>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">4.5 グラフ表示</h3>
+                        <p>「Analyze Data」ボタンをクリックすると、グラフウィンドウが表示されます。グラフタイプを選択することで、異なる視点からデータを確認できます。</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" fill="#1e40af"/>
+                        </svg>
+                        データ形式
+                    </h2>
+                    <div class="card-content">
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 10px;">5.1 JSONデータ形式</h3>
+                        <div class="code-block">{
+  "session_info": {
+    "track": "Suzuka Circuit",
+    "date": "2024-03-15",
+    "session_type": "Practice",
+    "track_length": 5.807
+  },
+  "lap_data": [
+    {
+      "Rider": "Rider A",
+      "Lap": 1,
+      "LapTime": "1:34.567",
+      "Sector1": "31.123",
+      "Sector2": "26.234",
+      "Sector3": "34.321",
+      "conditions": {
+        "tire": "soft",
+        "weather": "dry",
+        "track_temp": 26.5
+      }
+    }
+  ]
+}</div>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">5.2 CSVデータ形式</h3>
+                        <div class="code-block">Rider,Lap,LapTime,Sector1,Sector2,Sector3,TireType,Weather,TrackTemp
+Rider1,1,1:45.678,35.123,40.234,30.321,Soft,Dry,25</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" fill="#1e40af"/>
+                        </svg>
+                        サンプルデータの生成
+                    </h2>
+                    <div class="card-content">
+                        <p>テスト用のサンプルデータを生成するには、仮想環境が有効な状態で次のコマンドを実行します：</p>
+                        <div class="code-block">python generate_sample_data.py</div>
+                        
+                        <div class="note">
+                            <strong>Note:</strong> サンプルデータは<code>data/sample_data.json</code>に生成され、3人のライダー（A、B、C）の特徴的なラップパターンが含まれています。
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右カラム -->
+            <div class="column">
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z" fill="#1e40af"/>
+                        </svg>
+                        グラフの種類と機能
+                    </h2>
+                    <div class="card-content">
+                        <div class="graph-type">
+                            <div class="graph-type-title">ラップタイム推移（Lap Time Trend）</div>
+                            <p>各ラップのラップタイムを時系列で表示し、移動平均線も表示されパフォーマンスの傾向を把握できます。</p>
+                        </div>
+                        
+                        <div class="graph-type">
+                            <div class="graph-type-title">セクタータイム推移（Sector Time Trend）</div>
+                            <p>各セクターのタイムを時系列で表示し、問題があるセクターや改善したセクターを特定するのに役立ちます。</p>
+                        </div>
+                        
+                        <div class="graph-type">
+                            <div class="graph-type-title">セクタータイム比較（Sector Time Comparison）</div>
+                            <p>各ライダーのセクターごとの平均タイムを棒グラフで比較し、特定のセクターでの強みや弱みを特定できます。</p>
+                        </div>
+                        
+                        <div class="graph-type">
+                            <div class="graph-type-title">ラップタイム分布（Lap Time Histogram）</div>
+                            <p>ラップタイムの分布をヒストグラムで表示し、パフォーマンスの一貫性を評価するのに役立ちます。</p>
+                        </div>
+                        
+                        <div class="graph-type">
+                            <div class="graph-type-title">パフォーマンスレーダー（Performance Radar）</div>
+                            <p>各セクターのパフォーマンスをレーダーチャートで表示し、標準偏差の範囲も表示され安定性を評価できます。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" fill="#1e40af"/>
+                        </svg>
+                        トラブルシューティング
+                    </h2>
+                    <div class="card-content">
+                        <div class="bubble">
+                            <strong>データが読み込めない場合</strong>
+                            <ul class="handwritten-list">
+                                <li>ファイル形式（JSONまたはCSV）が正しいか確認してください。</li>
+                                <li>必要なフィールドが含まれているか確認してください。</li>
+                                <li>時間形式が正しいか確認してください（例: 1:23.456, 83.456）。</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bubble">
+                            <strong>グラフが表示されない場合</strong>
+                            <ul class="handwritten-list">
+                                <li>データが正しく読み込まれているか確認してください。</li>
+                                <li>「Analyze Data」ボタンをクリックして分析を実行してください。</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bubble">
+                            <strong>アプリケーションがクラッシュする場合</strong>
+                            <ul class="handwritten-list">
+                                <li>ログメッセージを確認してエラーの原因を特定してください。</li>
+                                <li>Python環境とライブラリのバージョンが互換性があるか確認してください。</li>
+                                <li>仮想環境が正しく有効化されているか確認してください。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19.0001 3H5.00006C3.90006 3 3.00006 3.9 3.00006 5V19C3.00006 20.1 3.90006 21 5.00006 21H19.0001C20.1001 21 21.0001 20.1 21.0001 19V5C21.0001 3.9 20.1001 3 19.0001 3ZM19.0001 19H5.00006V5H19.0001V19ZM7.00006 10H9.00006V17H7.00006V10ZM11.0001 7H13.0001V17H11.0001V7ZM15.0001 13H17.0001V17H15.0001V13Z" fill="#1e40af"/>
+                        </svg>
+                        システム要件と環境
+                    </h2>
+                    <div class="card-content">
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 10px;">システム要件</h3>
+                        <ul class="handwritten-list">
+                            <li>Windows 10/11（64ビット推奨）</li>
+                            <li>Python 3.8以上</li>
+                            <li>画面解像度: 1280×720以上推奨</li>
+                        </ul>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">必要なライブラリ</h3>
+                        <ul class="handwritten-list">
+                            <li>PyQt5 5.15.0以上: UIフレームワーク</li>
+                            <li>pandas 1.3.0以上: データ処理</li>
+                            <li>numpy 1.21.0以上: 数値計算</li>
+                            <li>matplotlib 3.4.0以上: グラフ描画</li>
+                            <li>seaborn 0.11.0以上: 高度なグラフ描画</li>
+                            <li>plotly 5.3.0以上: インタラクティブなグラフ</li>
+                        </ul>
+                        
+                        <div class="note">
+                            <strong>Note:</strong> すべての必要なライブラリは<code>requirements.txt</code>に記載されており、<code>create_venv.bat</code>スクリプトを使用することで自動的にインストールされます。
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 19H11V17H13V19ZM15.07 11.25L14.17 12.17C13.45 12.9 13 13.5 13 15H11V14.5C11 13.4 11.45 12.4 12.17 11.67L13.41 10.41C13.78 10.05 14 9.55 14 9C14 7.9 13.1 7 12 7C10.9 7 10 7.9 10 9H8C8 6.79 9.79 5 12 5C14.21 5 16 6.79 16 9C16 9.88 15.64 10.68 15.07 11.25Z" fill="#1e40af"/>
+                        </svg>
+                        開発情報
+                    </h2>
+                    <div class="card-content">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <p><strong>開発者:</strong> TakeshiArai-18</p>
+                                <p><strong>バージョン:</strong> <span class="version-tag">1.0</span></p>
+                                <p><strong>ライセンス:</strong> Copyright © 2025</p>
+                            </div>
+                            <div>
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#593C47"/>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <h3 style="font-size: 16px; color: var(--fashion-4); margin-top: 15px;">お問い合わせ</h3>
+                        <p><strong>GitHub:</strong> <a href="https://github.com/TakeshiArai-18/RiderAnalyzer" style="color: var(--fashion-4); text-decoration: none;">https://github.com/TakeshiArai-18/RiderAnalyzer</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            出典：RiderAnalyzer取扱説明書 | © TakeshiArai-18 2025
+        </div>
+    </div>
+</body>
+</html>
