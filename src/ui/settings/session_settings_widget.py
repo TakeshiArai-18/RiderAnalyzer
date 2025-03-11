@@ -82,7 +82,7 @@ class SessionSettingsWidget(BaseSettingsWidget):
         weather_layout = QHBoxLayout()
         weather_layout.addWidget(QLabel("天候:"))
         self.weather_combo = QComboBox()
-        self.weather_combo.addItems(["晴れ", "雨", "小雨"])
+        self.weather_combo.addItems(["Dry", "Wet", "Half Wet"])
         if current_session and isinstance(current_session, dict):
             current_weather = current_session.get("conditions", {}).get("weather", "")
             if current_weather:
@@ -146,5 +146,10 @@ class SessionSettingsWidget(BaseSettingsWidget):
             }
         }
         
-        print(f"Debug - Saving session settings: {session_settings}")
+        print(f"Debug - SessionSettingsWidget - Saving session settings: {session_settings}")
+        print(f"Debug - SessionSettingsWidget - track: '{circuit_name}', date: '{session_date}'")
         self.config_manager.update_setting("session", "settings", session_settings)
+        
+        # 設定が正しく保存されたか確認
+        saved_settings = self.config_manager.get_setting("session", "settings")
+        print(f"Debug - SessionSettingsWidget - Saved settings: {saved_settings}")

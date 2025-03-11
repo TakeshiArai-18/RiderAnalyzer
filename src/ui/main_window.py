@@ -315,28 +315,42 @@ class MainWindow(QMainWindow):
         try:
             # セッション情報を取得
             session_info = self.config_manager.get_session_settings()
-            print(f"Debug - Session Info: {session_info}")
+            print(f"Debug - MainWindow - Session Info from get_session_settings: {session_info}")
+            
+            # 設定から直接セッションデータを取得
+            raw_session_data = self.config_manager.get_setting("session", "settings")
+            print(f"Debug - MainWindow - Raw session data: {raw_session_data}")
             
             # JSONファイルとして保存
             json_file_path = file_base + '.json'
             json_saved = self.save_as_json(data, json_file_path, session_info)
             
-            # CSVファイルとして保存 - セッション情報に基づいてファイル名を変更
-            track = session_info.get('track', '')
-            date = session_info.get('date', '')
-            print(f"Debug - Track: '{track}', Date: '{date}'")
+            # CSVファイルとして保存 - 設定から直接トラック名と日付を取得
+            track = ""
+            date = ""
+            
+            if raw_session_data and isinstance(raw_session_data, dict):
+                # session.sessionからcircuit（トラック名）と日付を取得
+                session_subdata = raw_session_data.get("session", {})
+                if isinstance(session_subdata, dict):
+                    track = session_subdata.get("circuit", "")
+                    date = session_subdata.get("date", "")
+            
+            print(f"Debug - MainWindow - Directly retrieved - Track: '{track}', Date: '{date}'")
             
             # トラック名と日付があれば付加する
             if track and date:
                 # スペースをアンダースコアに置換
                 track_formatted = track.replace(' ', '_')
-                # ハイフンを除去
+                # ハイフンを除去（すでに日付にハイフンがない可能性あり）
                 date_formatted = date.replace('-', '')
                 csv_file_name = f"{file_base}_{track_formatted}_{date_formatted}.csv"
+                print(f"Debug - MainWindow - Using formatted filename with track and date")
             else:
                 csv_file_name = f"{file_base}.csv"
+                print(f"Debug - MainWindow - Using base filename (no track/date)")
                 
-            print(f"Debug - CSV Filename: {csv_file_name}")
+            print(f"Debug - MainWindow - CSV Filename: {csv_file_name}")
             csv_saved = self.save_as_csv(data, csv_file_name)
             
             if json_saved and csv_saved:

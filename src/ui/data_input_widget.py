@@ -24,7 +24,8 @@ class DataInputWidget(QWidget):
 
         # データ操作ボタン
         self.add_lap_button = QPushButton('Add Lap')
-        self.delete_data_button = QPushButton('Delete Data')
+        self.delete_data_button = QPushButton('Delete Selected')
+        self.delete_data_button.setToolTip('Delete selected lap data rows')
 
         # 解析ボタンを追加
         self.analyze_button = QPushButton('Analyze Data')
@@ -69,9 +70,20 @@ class DataInputWidget(QWidget):
         ])
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
+        
+        # 行選択モードを設定
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)  # 行単位での選択
+        self.table.setSelectionMode(QTableWidget.ExtendedSelection)  # 複数選択可能
+        
+        # セルが編集されたときのシグナルを接続
+        self.table.cellChanged.connect(self.on_cell_changed)
+        
         layout.addWidget(self.table)
 
         self.setLayout(layout)
+        
+        # 編集中フラグ (cellChangedイベントの再帰呼び出しを防止)
+        self.is_editing = False
 
     def update_riders_combo(self):
         """ライダー選択コンボボックスを更新"""
@@ -287,20 +299,42 @@ class DataInputWidget(QWidget):
                 
 
     def delete_data_clicked(self):
-        """データを削除するボタンがクリックされたときのハンドラ"""
+        """選択されたデータを削除するボタンがクリックされたときのハンドラ"""
         if not self.lap_data:
+            QMessageBox.information(self, "情報", "削除するデータがありません。")
             return
 
+        # 選択された行のインデックスを取得（ユニークな行のみ）
+        selected_indexes = self.table.selectedIndexes()
+        if not selected_indexes:
+            QMessageBox.information(self, "情報", "削除する行を選択してください。")
+            return
+
+        # 選択された行の番号を取得（重複なし）
+        selected_rows = set(index.row() for index in selected_indexes)
+        
+        # 確認ダイアログを表示
         reply = QMessageBox.question(
-            self, 'Confirm Delete',
-            'Are you sure you want to delete all data?',
+            self, '削除の確認',
+            f'選択された {len(selected_rows)} 行のデータを削除してもよろしいですか？',
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No
         )
 
         if reply == QMessageBox.Yes:
-            self.lap_data = []
-            self.update_data(self.lap_data, None)
+            # 選択された行のデータを特定して削除（逆順で処理して混乱を避ける）
+            rows_to_delete = sorted(selected_rows, reverse=True)
+            for row in rows_to_delete:
+                # テーブルに表示されている順序と実際のデータの順序が一致することを前提としています
+                if row < len(self.lap_data):
+                    del self.lap_data[row]
+            
+            # テーブルを更新
+            self.update_table()
+            
+            # データ変更シグナルを発行
             self.data_changed.emit(self.lap_data)
+            
+            QMessageBox.information(self, "情報", f"{len(selected_rows)} 行のデータが削除されました。")
 
     def update_data(self, laps, analysis_results=None):
         """データを更新し、テーブルに表示"""
@@ -388,3 +422,99 @@ class DataInputWidget(QWidget):
         
         # 解析リクエストを発行
         self.analyze_requested.emit(self.lap_data)
+
+    def on_cell_changed(self, row, column):
+        """セルの値が変更されたときの処理"""
+        # 編集中の場合は何もしない（再帰呼び出し防止）
+        if self.is_editing or row >= len(self.lap_data):
+            return
+            
+        self.is_editing = True
+        
+        try:
+            # 変更されたセルの値を取得
+            cell_value = self.table.item(row, column).text().strip()
+            
+            # 列ごとの検証と処理
+            is_valid = True
+            error_message = ""
+            
+            if column == 0:  # Rider
+                if not cell_value:
+                    is_valid = False
+                    error_message = "ライダー名は必須です"
+                self.lap_data[row]['Rider'] = cell_value
+                
+            elif column == 1:  # Lap
+                try:
+                    lap_num = int(cell_value)
+                    if lap_num <= 0:
+                        is_valid = False
+                        error_message = "ラップ番号は正の整数である必要があります"
+                    else:
+                        self.lap_data[row]['Lap'] = lap_num
+                except ValueError:
+                    is_valid = False
+                    error_message = "ラップ番号は整数である必要があります"
+                    
+            elif column in [2, 3, 4, 5]:  # LapTime, Sector1, Sector2, Sector3
+                column_names = {2: 'LapTime', 3: 'Sector1', 4: 'Sector2', 5: 'Sector3'}
+                if not cell_value:
+                    is_valid = False
+                    error_message = f"{column_names[column]}は必須です"
+                elif not self.time_converter.is_valid_time_string(cell_value):
+                    is_valid = False
+                    error_message = f"{column_names[column]}は有効な時間形式である必要があります"
+                else:
+                    self.lap_data[row][column_names[column]] = cell_value
+                    
+                    # セクタータイムの合計とラップタイムの整合性チェック
+                    if column in [2, 3, 4, 5] and all(self.table.item(row, c) and self.table.item(row, c).text().strip() for c in [2, 3, 4, 5]):
+                        lap_time = self.table.item(row, 2).text().strip()
+                        sector1 = self.table.item(row, 3).text().strip()
+                        sector2 = self.table.item(row, 4).text().strip()
+                        sector3 = self.table.item(row, 5).text().strip()
+                        
+                        if all(self.time_converter.is_valid_time_string(t) for t in [lap_time, sector1, sector2, sector3]):
+                            lap_time_ms = self.time_converter.time_string_to_milliseconds(lap_time)
+                            sector_total_ms = (
+                                self.time_converter.time_string_to_milliseconds(sector1) +
+                                self.time_converter.time_string_to_milliseconds(sector2) +
+                                self.time_converter.time_string_to_milliseconds(sector3)
+                            )
+                            
+                            # 許容誤差 (10ミリ秒)
+                            if abs(lap_time_ms - sector_total_ms) > 10:
+                                discrepancy = abs(lap_time_ms - sector_total_ms) / 1000.0  # 秒単位に変換
+                                warning = f"セクタータイムの合計とラップタイムに{discrepancy:.3f}秒の差異があります。"
+                                QMessageBox.warning(self, '警告', warning)
+                    
+            elif column == 6:  # TireType
+                self.lap_data[row]['TireType'] = cell_value
+                
+            elif column == 7:  # Weather
+                self.lap_data[row]['Weather'] = cell_value
+                
+            elif column == 8:  # TrackTemp
+                # 数値として解釈可能か確認（オプション）
+                if cell_value and not cell_value.isdigit() and not (cell_value.replace('.', '', 1).isdigit() and cell_value.count('.') <= 1):
+                    # 警告を表示するが、値は許可する（文字列として保存）
+                    QMessageBox.warning(self, '警告', "路面温度は数値であることが望ましいです")
+                self.lap_data[row]['TrackTemp'] = cell_value
+            
+            # 検証失敗時は元の値に戻す
+            if not is_valid:
+                QMessageBox.warning(self, "入力エラー", error_message)
+                # テーブルを更新して元の値に戻す
+                self.update_table()
+            else:
+                # データ変更シグナルを発行
+                self.data_changed.emit(self.lap_data)
+                
+        except Exception as e:
+            print(f"セル編集エラー: {e}")
+            QMessageBox.warning(self, "エラー", f"データの編集中にエラーが発生しました: {str(e)}")
+            self.update_table()  # エラー時はテーブルを元に戻す
+        
+        finally:
+            self.is_editing = False

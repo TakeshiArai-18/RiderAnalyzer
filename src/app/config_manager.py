@@ -339,15 +339,38 @@ class ConfigManager:
                 "TrackTemp": ""
             }
         
-        # トラック名に値がないかチェック
-        track = session_data.get("track", "Unknown Track")
+        # セッション情報の構造を詳細にデバッグ
+        print(f"Debug - Config Manager - Session data keys: {session_data.keys()}")
+        
+        # セッション情報がJSON構造に基づいて正しく取得
+        session_info = session_data.get("session", {})
+        
+        # session.circuitからトラック名を取得（優先）、次にトップレベルのtrackキーを確認
+        track = ""
+        if session_info and isinstance(session_info, dict):
+            track = session_info.get("circuit", "")
+        
+        # 上記で取得できなければsession_dataのトップレベルのtrackキーを確認
+        if not track or track.strip() == "":
+            track = session_data.get("track", "")
+            
         if not track or track.strip() == "":
             track = "Unknown Track"
+        
+        # session.dateから日付を取得（優先）、次にトップレベルのdateキーを確認
+        date = ""
+        if session_info and isinstance(session_info, dict):
+            date = session_info.get("date", "")
             
-        # 日付に値がないかチェック
-        date = session_data.get("date", "")
+        # 上記で取得できなければsession_dataのトップレベルのdateキーを確認
+        if not date or date.strip() == "":
+            date = session_data.get("date", "")
+            
         if not date or date.strip() == "":
             date = ""
+        
+        print(f"Debug - Config Manager - Session info: {session_info}")
+        print(f"Debug - Config Manager - Track: '{track}', Date: '{date}'")
         
         # 条件情報とセッション基本情報を取得
         conditions = session_data.get("conditions", {})
