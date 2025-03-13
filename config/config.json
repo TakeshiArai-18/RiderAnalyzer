@@ -58,31 +58,38 @@
                 "color": "#1f77b4",
                 "default": true,
                 "id": "rider2"
+            },
+            {
+                "name": "\u9577\u7530",
+                "bike": "MUSHMANS2025",
+                "color": "#aa55ff",
+                "default": false,
+                "id": "rider3"
+            },
+            {
+                "name": "\u570b\u5ddd",
+                "bike": "MUSHMANS2025",
+                "color": "#000000",
+                "default": false,
+                "id": "rider4"
             }
         ]
     },
     "tires_settings": {
         "tires_list": [
             {
-                "name": "\u30bd\u30d5\u30c8",
-                "description": "\u30bd\u30d5\u30c8\u30b3\u30f3\u30d1\u30a6\u30f3\u30c9",
-                "color": "#ffc0cb",
-                "default": true,
-                "id": "tire1"
+                "name": "KR410",
+                "description": "\u30c0\u30f3\u30ed\u30c3\u30d7",
+                "color": "#00ff00",
+                "default": false,
+                "id": "tire4"
             },
             {
-                "name": "\u30df\u30c7\u30a3\u30a2\u30e0",
-                "description": "\u30df\u30c7\u30a3\u30a2\u30e0\u30b3\u30f3\u30d1\u30a6\u30f9\u30c9",
-                "color": "#ffff00",
+                "name": "SUPERCORSA SC - V4",
+                "description": "\u30d4\u30ec\u30ea",
+                "color": "#ff00ff",
                 "default": false,
                 "id": "tire2"
-            },
-            {
-                "name": "\u30cf\u30fc\u30c9",
-                "description": "\u30cf\u30fc\u30c9\u30b3\u30f3\u30d1\u30a6\u30f9\u30c9",
-                "color": "#c0c0c0",
-                "default": false,
-                "id": "tire3"
             }
         ]
     },
@@ -112,7 +119,9 @@
         "lap_trend_window_size": "3",
         "radar_window_size": "3",
         "radar_alpha": "0.2",
-        "rider_color_\u85e4\u7530": "#1f77b4"
+        "rider_color_\u85e4\u7530": "#1f77b4",
+        "rider_color_\u9577\u7530": "#aa55ff",
+        "rider_color_\u570b\u5ddd": "#000000"
     },
     "color": {
         "settings": {
@@ -124,13 +133,14 @@
     "session": {
         "settings": {
             "session": {
-                "name": "\u3082\u3067\u304e\u516c\u958b\u7df4\u7fd21",
-                "circuit": "\u3082\u3067\u304d",
-                "date": "20250314"
+                "name": "\u3082\u3067\u304e\u516c\u958b\u7df4\u7fd21"
             },
+            "track": "\u3082\u3066\u304e",
+            "date": "20250314",
+            "session_type": "Practice",
             "conditions": {
                 "tire": "\u30bd\u30d5\u30c8",
-                "weather": "\u6674\u308c",
+                "weather": "Dry",
                 "air_temp": 20.0,
                 "track_temp": 30.0
             }
