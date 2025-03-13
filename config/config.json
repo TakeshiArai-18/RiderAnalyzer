@@ -139,7 +139,6 @@
             "date": "20250314",
             "session_type": "Practice",
             "conditions": {
-                "tire": "\u30bd\u30d5\u30c8",
                 "weather": "Dry",
                 "air_temp": 20.0,
                 "track_temp": 30.0

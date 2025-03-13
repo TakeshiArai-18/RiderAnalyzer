@@ -66,18 +66,6 @@ class SessionSettingsWidget(BaseSettingsWidget):
         condition_group = QGroupBox("コンディション")
         condition_layout = QVBoxLayout()
         
-        # タイヤ選択
-        tire_layout = QHBoxLayout()
-        tire_layout.addWidget(QLabel("タイヤ:"))
-        self.tire_combo = QComboBox()
-        self.tire_combo.addItems(["ソフト", "ミディアム", "ハード"])
-        if current_session and isinstance(current_session, dict):
-            current_tire = current_session.get("conditions", {}).get("tire", "")
-            if current_tire:
-                self.tire_combo.setCurrentText(current_tire)
-        tire_layout.addWidget(self.tire_combo)
-        condition_layout.addLayout(tire_layout)
-        
         # 天候
         weather_layout = QHBoxLayout()
         weather_layout.addWidget(QLabel("天候:"))
@@ -139,7 +127,6 @@ class SessionSettingsWidget(BaseSettingsWidget):
             "date": session_date,
             "session_type": self.session_type_combo.currentText() or "Practice",
             "conditions": {
-                "tire": self.tire_combo.currentText(),
                 "weather": self.weather_combo.currentText(),
                 "air_temp": self.air_temp.value(),
                 "track_temp": self.track_temp.value()
