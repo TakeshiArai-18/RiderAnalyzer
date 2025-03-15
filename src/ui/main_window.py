@@ -190,6 +190,7 @@ class MainWindow(QMainWindow):
             # 解析が必要であることを通知
             self.statusBar().showMessage("データが変更されました。解析するには'Analyze Data'ボタンをクリックしてください。", 5000)
         except Exception as e:
+            print(f"Error updating data: {str(e)}")
             QMessageBox.critical(self, "Error", f"Failed to update data: {str(e)}")
 
     def on_analyze_requested(self, data):
@@ -220,6 +221,16 @@ class MainWindow(QMainWindow):
 
     def on_settings_updated(self, settings):
         """設定が更新されたときの処理"""
+        # 設定変更前のセクター数を取得
+        old_num_sectors = getattr(self, '_cached_num_sectors', None)
+        if old_num_sectors is None:
+            # 初回実行時はキャッシュがないので現在の値を使用
+            old_num_sectors = self.config_manager.get_num_sectors()
+            self._cached_num_sectors = old_num_sectors
+            
+        # 現在のセクター数を取得
+        current_num_sectors = self.config_manager.get_num_sectors()
+        
         # 設定変更を保存
         self.config_manager.save_config()
         
@@ -229,7 +240,19 @@ class MainWindow(QMainWindow):
         # グラフウィンドウが存在する場合は更新
         if self.graph_window:
             self.graph_window.graph_widget.update_graph()
-            
+        
+        # セクター数が変更された場合はメッセージを表示
+        if old_num_sectors != current_num_sectors:
+            QMessageBox.information(
+                self,
+                "セクター数の変更",
+                f"セクター数が{old_num_sectors}から{current_num_sectors}に変更されました。\n"
+                "この変更を完全に適用するには、アプリケーションの再起動が必要です。\n"
+                "再起動後、テーブルやグラフに新しいセクター数が正しく反映されます。"
+            )
+            # 新しいセクター数をキャッシュ
+            self._cached_num_sectors = current_num_sectors
+
     def update_riders_and_tires(self):
         """ライダーとタイヤの情報を更新する"""
         # DataInputWidgetのコンボボックスを更新

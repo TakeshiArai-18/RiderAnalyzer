@@ -64,10 +64,19 @@ class DataInputWidget(QWidget):
 
         # テーブルウィジェット
         self.table = QTableWidget()
-        self.table.setColumnCount(9)  # コンディション情報を分割するため列数増加
-        self.table.setHorizontalHeaderLabels([
-            'Rider', 'Lap', 'Time', 'Sector1', 'Sector2', 'Sector3', 'タイヤ', '天候', '路面温度'
-        ])
+        # セクター数を取得
+        self.num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+        # 基本の列 (Rider, Lap, Time) + セクター数 + コンディション情報 (タイヤ, 天候, 路面温度)
+        num_columns = 3 + self.num_sectors + 3
+        self.table.setColumnCount(num_columns)
+        
+        # ヘッダーラベルを動的に生成
+        header_labels = ['Rider', 'Lap', 'Time']
+        for i in range(1, self.num_sectors + 1):
+            header_labels.append(f'Sector{i}')
+        header_labels.extend(['タイヤ', '天候', '路面温度'])
+        
+        self.table.setHorizontalHeaderLabels(header_labels)
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
         
@@ -159,12 +168,16 @@ class DataInputWidget(QWidget):
         lap_number = QLineEdit()
         lap_time = QLineEdit()
         lap_time.setPlaceholderText("mm:ss.fff")
-        sector1 = QLineEdit()
-        sector1.setPlaceholderText("ss.fff")
-        sector2 = QLineEdit()
-        sector2.setPlaceholderText("ss.fff")
-        sector3 = QLineEdit()
-        sector3.setPlaceholderText("ss.fff")
+        
+        # セクター数を取得
+        num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+        
+        # セクターフィールドを動的に生成
+        sector_fields = []
+        for i in range(num_sectors):
+            sector_field = QLineEdit()
+            sector_field.setPlaceholderText("ss.fff")
+            sector_fields.append(sector_field)
         
         tire_combo = QComboBox()
         tire_combo.addItems([tire.get("name", "") for tire in self.config_manager.get_tires_list()])
@@ -195,9 +208,11 @@ class DataInputWidget(QWidget):
         layout.addRow("ライダー:", rider_combo)
         layout.addRow("ラップ番号:", lap_number)
         layout.addRow("ラップタイム:", lap_time)
-        layout.addRow("セクター1:", sector1)
-        layout.addRow("セクター2:", sector2)
-        layout.addRow("セクター3:", sector3)
+        
+        # セクターフィールドを動的に追加
+        for i, sector_field in enumerate(sector_fields):
+            layout.addRow(f"セクター{i+1}:", sector_field)
+        
         layout.addRow("タイヤ:", tire_combo)
         layout.addRow("天候:", weather)
         layout.addRow("路面温度:", track_temp)
@@ -218,14 +233,14 @@ class DataInputWidget(QWidget):
             # ライダー名の検証
             if not rider_combo.currentText():
                 validation_errors.append("ライダー名は必須です")
-            
+                
             # ラップ番号の検証
             try:
                 lap_num = int(lap_number.text())
                 if lap_num <= 0:
-                    validation_errors.append("ラップ番号は正の整数を入力してください")
+                    validation_errors.append("ラップ番号は正の整数である必要があります")
             except ValueError:
-                validation_errors.append("ラップ番号は整数で入力してください")
+                validation_errors.append("ラップ番号は整数である必要があります")
                 
             # ラップタイムの検証
             lap_time_str = lap_time.text().strip()
@@ -235,47 +250,48 @@ class DataInputWidget(QWidget):
                 validation_errors.append("ラップタイムは有効な形式で入力してください (例: 1:23.456)")
                 
             # セクタータイムの検証
-            for i, sector_time in enumerate([sector1.text().strip(), sector2.text().strip(), sector3.text().strip()], 1):
+            for i, sector_field in enumerate(sector_fields):
+                sector_time = sector_field.text().strip()
                 if not sector_time:
-                    validation_errors.append(f"セクター{i}タイムは必須です")
+                    validation_errors.append(f"セクター{i+1}タイムは必須です")
                 elif not self.time_converter.is_valid_time_string(sector_time):
-                    validation_errors.append(f"セクター{i}タイムは有効な形式で入力してください (例: 23.456)")
+                    validation_errors.append(f"セクター{i+1}タイムは有効な形式で入力してください (例: 23.456)")
             
-            # 検証エラーがある場合はメッセージを表示して処理を中断
+            # 検証エラーがあれば表示して終了
             if validation_errors:
-                error_message = "以下のエラーを修正してください:\n• " + "\n• ".join(validation_errors)
-                QMessageBox.warning(self, "入力エラー", error_message)
-                # ダイアログを再表示
+                QMessageBox.warning(self, "入力エラー", "\n".join(validation_errors))
+                # 再度ダイアログを表示
                 self.add_lap_clicked()
                 return
                 
             try:
-                # データの作成
+                # 新規ラップデータを作成
                 new_lap = {
                     "Rider": rider_combo.currentText(),
                     "Lap": lap_num,
                     "LapTime": lap_time_str,
-                    "Sector1": sector1.text().strip(),
-                    "Sector2": sector2.text().strip(),
-                    "Sector3": sector3.text().strip(),
                     "TireType": tire_combo.currentText(),
                     "Weather": weather.text().strip(),
                     "TrackTemp": track_temp.text().strip()
                 }
                 
+                # セクタータイムを動的に追加
+                for i, sector_field in enumerate(sector_fields):
+                    new_lap[f"Sector{i+1}"] = sector_field.text().strip()
+                
                 # セクタータイムの合計がラップタイムと一致するか確認（警告のみ）
                 lap_time_ms = self.time_converter.time_string_to_milliseconds(lap_time_str)
-                sector_total_ms = (
-                    self.time_converter.time_string_to_milliseconds(sector1.text().strip()) +
-                    self.time_converter.time_string_to_milliseconds(sector2.text().strip()) +
-                    self.time_converter.time_string_to_milliseconds(sector3.text().strip())
-                )
+                
+                # すべてのセクターの合計を計算
+                sector_total_ms = 0
+                for sector_field in sector_fields:
+                    sector_total_ms += self.time_converter.time_string_to_milliseconds(sector_field.text().strip())
                 
                 # 許容誤差 (10ミリ秒)
                 if abs(lap_time_ms - sector_total_ms) > 10:
                     discrepancy = abs(lap_time_ms - sector_total_ms) / 1000.0  # 秒単位に変換
                     warning = f"セクタータイムの合計とラップタイムに{discrepancy:.3f}秒の差異があります。\n" \
-                              f"それでもこのデータを追加しますか？"
+                            f"それでもこのデータを追加しますか？"
                     reply = QMessageBox.question(self, '確認', warning,
                                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                     
@@ -339,50 +355,111 @@ class DataInputWidget(QWidget):
     def update_data(self, laps, analysis_results=None):
         """データを更新し、テーブルに表示"""
         self.lap_data = laps
-        self.table.setRowCount(len(laps))
+        
+        # 編集中フラグを設定
+        self.is_editing = True
+        
+        try:
+            # テーブルのクリア
+            self.table.setRowCount(0)
+            
+            if not laps:
+                return
+                
+            # セクター数を取得
+            num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+            
+            # テーブルの列数を更新（動的にセクター数に対応）
+            num_columns = 3 + num_sectors + 3  # 基本列 + セクター + コンディション
+            if self.table.columnCount() != num_columns:
+                self.table.setColumnCount(num_columns)
+                
+                # ヘッダーラベルを動的に生成
+                header_labels = ['Rider', 'Lap', 'LapTime']
+                for i in range(1, num_sectors + 1):
+                    header_labels.append(f'Sector{i}')
+                header_labels.extend(['タイヤ', '天候', '路面温度'])
+                
+                self.table.setHorizontalHeaderLabels(header_labels)
+                header = self.table.horizontalHeader()
+                header.setSectionResizeMode(QHeaderView.Stretch)
+            
+            # テーブルの行数を設定
+            self.table.setRowCount(len(laps))
 
-        for row, lap in enumerate(laps):
-            # 基本データの設定
-            self.table.setItem(row, 0, QTableWidgetItem(str(lap['Rider'])))
-            self.table.setItem(row, 1, QTableWidgetItem(str(lap['Lap'])))
-            self.table.setItem(row, 2, QTableWidgetItem(str(lap['LapTime'])))
-            self.table.setItem(row, 3, QTableWidgetItem(str(lap['Sector1'])))
-            self.table.setItem(row, 4, QTableWidgetItem(str(lap['Sector2'])))
-            self.table.setItem(row, 5, QTableWidgetItem(str(lap['Sector3'])))
+            # データを表示
+            for row, lap in enumerate(laps):
+                # 基本データ
+                self.table.setItem(row, 0, QTableWidgetItem(str(lap.get('Rider', ''))))
+                self.table.setItem(row, 1, QTableWidgetItem(str(lap.get('Lap', ''))))
+                self.table.setItem(row, 2, QTableWidgetItem(str(lap.get('LapTime', ''))))
+                
+                # セクターデータ（動的に生成）
+                for i in range(num_sectors):
+                    sector_key = f'Sector{i+1}'
+                    self.table.setItem(row, 3 + i, QTableWidgetItem(str(lap.get(sector_key, ''))))
+                
+                # コンディション情報
+                condition_offset = 3 + num_sectors
+                self.table.setItem(row, condition_offset, QTableWidgetItem(str(lap.get('TireType', ''))))
+                self.table.setItem(row, condition_offset + 1, QTableWidgetItem(str(lap.get('Weather', ''))))
+                self.table.setItem(row, condition_offset + 2, QTableWidgetItem(str(lap.get('TrackTemp', ''))))
 
-            # コンディション情報を個別に設定
-            self.table.setItem(row, 6, QTableWidgetItem(str(lap.get('TireType', ''))))
-            self.table.setItem(row, 7, QTableWidgetItem(str(lap.get('Weather', ''))))
-            self.table.setItem(row, 8, QTableWidgetItem(str(lap.get('TrackTemp', ''))))
-
-            # 最速/最遅ラップの色付け
-            if analysis_results and 'fastest_lap' in analysis_results and 'slowest_lap' in analysis_results:
-                if lap == analysis_results['fastest_lap']:
-                    for col in range(9):  # 列数を変更
-                        self.table.item(row, col).setBackground(QColor(200, 255, 200))
-                elif lap == analysis_results['slowest_lap']:
-                    for col in range(9):  # 列数を変更
-                        self.table.item(row, col).setBackground(QColor(255, 200, 200))
+                # 最速/最遅ラップの色付け
+                if analysis_results and 'fastest_lap' in analysis_results and 'slowest_lap' in analysis_results:
+                    if lap == analysis_results['fastest_lap']:
+                        for col in range(num_columns):  # 動的な列数に合わせる
+                            self.table.item(row, col).setBackground(QColor(200, 255, 200))
+                    elif lap == analysis_results['slowest_lap']:
+                        for col in range(num_columns):  # 動的な列数に合わせる
+                            self.table.item(row, col).setBackground(QColor(255, 200, 200))
+        except Exception as e:
+            print(f"Error updating data: {str(e)}")
+        finally:
+            # 編集中フラグを解除
+            self.is_editing = False
 
     def update_table(self):
-        """テーブルウィジェットを更新"""
-        self.table.setRowCount(len(self.lap_data))
+        """データテーブルを更新する"""
+        # 編集中フラグを設定
+        self.is_editing = True
         
-        for row, lap in enumerate(self.lap_data):
-            try:
-                self.table.setItem(row, 0, QTableWidgetItem(str(lap.get("Rider", ""))))
-                self.table.setItem(row, 1, QTableWidgetItem(str(lap.get("Lap", ""))))
-                self.table.setItem(row, 2, QTableWidgetItem(str(lap.get("LapTime", ""))))
-                self.table.setItem(row, 3, QTableWidgetItem(str(lap.get("Sector1", ""))))
-                self.table.setItem(row, 4, QTableWidgetItem(str(lap.get("Sector2", ""))))
-                self.table.setItem(row, 5, QTableWidgetItem(str(lap.get("Sector3", ""))))
-                self.table.setItem(row, 6, QTableWidgetItem(str(lap.get("TireType", ""))))
-                self.table.setItem(row, 7, QTableWidgetItem(str(lap.get("Weather", ""))))
-                self.table.setItem(row, 8, QTableWidgetItem(str(lap.get("TrackTemp", ""))))
-            except Exception as e:
-                print(f"テーブル更新エラー (行 {row}): {str(e)}")
-                print(f"問題のデータ: {lap}")
-                # エラーが発生しても処理を続行
+        try:
+            # テーブルのクリア
+            self.table.setRowCount(0)
+            
+            if not self.lap_data:
+                self.is_editing = False
+                return
+                
+            # セクター数を取得
+            num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+                
+            # データの挿入
+            for i, lap in enumerate(self.lap_data):
+                self.table.insertRow(i)
+                
+                # 基本データ
+                self.table.setItem(i, 0, QTableWidgetItem(str(lap.get('Rider', ''))))
+                self.table.setItem(i, 1, QTableWidgetItem(str(lap.get('Lap', ''))))
+                self.table.setItem(i, 2, QTableWidgetItem(str(lap.get('LapTime', ''))))
+                
+                # セクターデータ（動的に生成）
+                for j in range(num_sectors):
+                    sector_key = f'Sector{j+1}'
+                    self.table.setItem(i, 3 + j, QTableWidgetItem(str(lap.get(sector_key, ''))))
+                
+                # コンディション情報
+                condition_offset = 3 + num_sectors
+                self.table.setItem(i, condition_offset, QTableWidgetItem(str(lap.get('TireType', ''))))
+                self.table.setItem(i, condition_offset + 1, QTableWidgetItem(str(lap.get('Weather', ''))))
+                self.table.setItem(i, condition_offset + 2, QTableWidgetItem(str(lap.get('TrackTemp', ''))))
+                
+        except Exception as e:
+            print(f"Error updating table: {str(e)}")
+        finally:
+            # 編集中フラグを解除
+            self.is_editing = False
 
     def get_latest_lap_for_rider(self, rider_name):
         """指定されたライダーの最新ラップデータを取得
@@ -435,6 +512,9 @@ class DataInputWidget(QWidget):
             # 変更されたセルの値を取得
             cell_value = self.table.item(row, column).text().strip()
             
+            # セクター数を取得
+            num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+            
             # 列ごとの検証と処理
             is_valid = True
             error_message = ""
@@ -457,31 +537,49 @@ class DataInputWidget(QWidget):
                     is_valid = False
                     error_message = "ラップ番号は整数である必要があります"
                     
-            elif column in [2, 3, 4, 5]:  # LapTime, Sector1, Sector2, Sector3
-                column_names = {2: 'LapTime', 3: 'Sector1', 4: 'Sector2', 5: 'Sector3'}
+            elif column == 2:  # LapTime
                 if not cell_value:
                     is_valid = False
-                    error_message = f"{column_names[column]}は必須です"
+                    error_message = "ラップタイムは必須です"
                 elif not self.time_converter.is_valid_time_string(cell_value):
                     is_valid = False
-                    error_message = f"{column_names[column]}は有効な時間形式である必要があります"
+                    error_message = "ラップタイムは有効な形式で入力してください (例: 1:23.456)"
                 else:
-                    self.lap_data[row][column_names[column]] = cell_value
+                    self.lap_data[row]['LapTime'] = cell_value
                     
-                    # セクタータイムの合計とラップタイムの整合性チェック
-                    if column in [2, 3, 4, 5] and all(self.table.item(row, c) and self.table.item(row, c).text().strip() for c in [2, 3, 4, 5]):
+            elif 3 <= column < 3 + num_sectors:  # セクタータイム（動的）
+                # セクターのインデックスを計算（0から始まる）
+                sector_index = column - 3
+                sector_key = f'Sector{sector_index + 1}'
+                
+                if not cell_value:
+                    is_valid = False
+                    error_message = f"{sector_key}は必須です"
+                elif not self.time_converter.is_valid_time_string(cell_value):
+                    is_valid = False
+                    error_message = f"{sector_key}は有効な形式で入力してください (例: 23.456)"
+                else:
+                    self.lap_data[row][sector_key] = cell_value
+                    
+                    # すべてのセクターとラップタイムが有効であれば合計時間を検証
+                    if is_valid and self.table.item(row, 2):
                         lap_time = self.table.item(row, 2).text().strip()
-                        sector1 = self.table.item(row, 3).text().strip()
-                        sector2 = self.table.item(row, 4).text().strip()
-                        sector3 = self.table.item(row, 5).text().strip()
                         
-                        if all(self.time_converter.is_valid_time_string(t) for t in [lap_time, sector1, sector2, sector3]):
+                        # すべてのセクターの時間を取得
+                        sector_times = []
+                        for i in range(num_sectors):
+                            sector_cell = self.table.item(row, 3 + i)
+                            if sector_cell:
+                                sector_times.append(sector_cell.text().strip())
+                        
+                        # すべてのセクターとラップタイムが有効な形式か確認
+                        if (lap_time and 
+                            self.time_converter.is_valid_time_string(lap_time) and
+                            len(sector_times) == num_sectors and
+                            all(self.time_converter.is_valid_time_string(t) for t in sector_times)):
+                            
                             lap_time_ms = self.time_converter.time_string_to_milliseconds(lap_time)
-                            sector_total_ms = (
-                                self.time_converter.time_string_to_milliseconds(sector1) +
-                                self.time_converter.time_string_to_milliseconds(sector2) +
-                                self.time_converter.time_string_to_milliseconds(sector3)
-                            )
+                            sector_total_ms = sum(self.time_converter.time_string_to_milliseconds(t) for t in sector_times)
                             
                             # 許容誤差 (10ミリ秒)
                             if abs(lap_time_ms - sector_total_ms) > 10:
@@ -489,18 +587,20 @@ class DataInputWidget(QWidget):
                                 warning = f"セクタータイムの合計とラップタイムに{discrepancy:.3f}秒の差異があります。"
                                 QMessageBox.warning(self, '警告', warning)
                     
-            elif column == 6:  # TireType
+            elif column == 3 + num_sectors:  # TireType
                 self.lap_data[row]['TireType'] = cell_value
                 
-            elif column == 7:  # Weather
+            elif column == 3 + num_sectors + 1:  # Weather
                 self.lap_data[row]['Weather'] = cell_value
                 
-            elif column == 8:  # TrackTemp
-                # 数値として解釈可能か確認（オプション）
-                if cell_value and not cell_value.isdigit() and not (cell_value.replace('.', '', 1).isdigit() and cell_value.count('.') <= 1):
-                    # 警告を表示するが、値は許可する（文字列として保存）
-                    QMessageBox.warning(self, '警告', "路面温度は数値であることが望ましいです")
-                self.lap_data[row]['TrackTemp'] = cell_value
+            elif column == 3 + num_sectors + 2:  # TrackTemp
+                try:
+                    # 数値として解釈できるか確認（警告のみ）
+                    float(cell_value) if cell_value else 0
+                    self.lap_data[row]['TrackTemp'] = cell_value
+                except ValueError:
+                    QMessageBox.warning(self, '警告', "路面温度は数値で入力することを推奨します。")
+                    self.lap_data[row]['TrackTemp'] = cell_value
             
             # 検証失敗時は元の値に戻す
             if not is_valid:

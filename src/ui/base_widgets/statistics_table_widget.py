@@ -43,13 +43,16 @@ class StatisticsTableWidget(BaseTableWidget):
         
     def configure_columns(self):
         """カラム設定"""
-        headers = [
-            "Rider",
-            "Lap Time", "Lap Time SD",
-            "Sector1", "Sector1 SD",
-            "Sector2", "Sector2 SD",
-            "Sector3", "Sector3 SD"
-        ]
+        # セクター数を取得
+        num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+        
+        # ヘッダーを動的に生成
+        headers = ["Rider", "Lap Time", "Lap Time SD"]
+        
+        # セクターごとのヘッダーを動的に追加
+        for i in range(1, num_sectors + 1):
+            headers.append(f"Sector{i}")
+            headers.append(f"Sector{i} SD")
         
         resizable_columns = [0]  # Rider列のみリサイズ可能
         fixed_width_columns = {i: 100 for i in range(1, len(headers))}  # 残りの列は固定幅
@@ -82,6 +85,14 @@ class StatisticsTableWidget(BaseTableWidget):
         if not rider_stats:
             return
             
+        # セクター数を取得
+        num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+        
+        # テーブルの列数が変わっていれば再設定
+        total_columns = 3 + num_sectors * 2  # Rider + Lap Time/SD + Sectors/SD
+        if self.table.columnCount() != total_columns:
+            self.configure_columns()
+            
         # テーブルにデータを設定
         self.table.setRowCount(len(rider_stats))
         for row, (rider, stats) in enumerate(rider_stats.items()):
@@ -94,23 +105,20 @@ class StatisticsTableWidget(BaseTableWidget):
             if 'lap_time_std' in stats:
                 self.table.setItem(row, 2, StdDevStatItem(stats['lap_time_std']))
                 
-            # セクター1統計
-            if 'sector1_mean' in stats:
-                self.table.setItem(row, 3, TimeStatItem(stats['sector1_mean']))
-            if 'sector1_std' in stats:
-                self.table.setItem(row, 4, StdDevStatItem(stats['sector1_std']))
+            # セクター統計（動的に処理）
+            for i in range(1, num_sectors + 1):
+                # セクター統計の列位置を計算
+                col_offset = 3 + (i-1) * 2
                 
-            # セクター2統計
-            if 'sector2_mean' in stats:
-                self.table.setItem(row, 5, TimeStatItem(stats['sector2_mean']))
-            if 'sector2_std' in stats:
-                self.table.setItem(row, 6, StdDevStatItem(stats['sector2_std']))
-                
-            # セクター3統計
-            if 'sector3_mean' in stats:
-                self.table.setItem(row, 7, TimeStatItem(stats['sector3_mean']))
-            if 'sector3_std' in stats:
-                self.table.setItem(row, 8, StdDevStatItem(stats['sector3_std']))
+                # セクターの平均値
+                sector_mean_key = f'sector{i}_mean'
+                if sector_mean_key in stats:
+                    self.table.setItem(row, col_offset, TimeStatItem(stats[sector_mean_key]))
+                    
+                # セクターの標準偏差
+                sector_std_key = f'sector{i}_std'
+                if sector_std_key in stats:
+                    self.table.setItem(row, col_offset + 1, StdDevStatItem(stats[sector_std_key]))
 
         # 最速ライダーと最遅ライダーの行に色を付ける
         if 'fastest_rider' in self.current_stats and 'slowest_rider' in self.current_stats:
@@ -133,6 +141,14 @@ class StatisticsTableWidget(BaseTableWidget):
 
             if not stats_data:
                 return
+            
+            # セクター数を取得
+            num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+            
+            # テーブルの列数が変わっていれば再設定
+            total_columns = 3 + num_sectors * 2  # Rider + Lap Time/SD + Sectors/SD
+            if self.table.columnCount() != total_columns:
+                self.configure_columns()
 
             # 特別なキーをフィルタリング
             special_keys = ['fastest_rider', 'slowest_rider']
@@ -177,21 +193,23 @@ class StatisticsTableWidget(BaseTableWidget):
                 self._apply_color_to_cell(lap_std_item, lap_stats['std_dev'], 
                                         extremes, 'std_devs', 'lap_time', std_settings)
 
-                # セクタータイム
-                for i, sector in enumerate(['sector1', 'sector2', 'sector3']):
-                    sector_stats = stats['sectors'][sector]
-                    col_offset = 3 + i * 2
-                    
-                    time_item = TimeStatItem(sector_stats['moving_avg'])
-                    std_item = StdDevStatItem(sector_stats['std_dev'])
-                    
-                    self.table.setItem(row, col_offset, time_item)
-                    self.table.setItem(row, col_offset + 1, std_item)
-                    
-                    self._apply_color_to_cell(time_item, sector_stats['moving_avg'], 
-                                            extremes, 'times', sector, time_settings)
-                    self._apply_color_to_cell(std_item, sector_stats['std_dev'], 
-                                            extremes, 'std_devs', sector, std_settings)
+                # セクタータイム（動的に処理）
+                for i in range(1, num_sectors + 1):
+                    sector_key = f'sector{i}'
+                    if sector_key in stats['sectors']:
+                        sector_stats = stats['sectors'][sector_key]
+                        col_offset = 3 + (i-1) * 2  # ラップタイム列(2列)の後からセクターデータが始まる
+                        
+                        time_item = TimeStatItem(sector_stats['moving_avg'])
+                        std_item = StdDevStatItem(sector_stats['std_dev'])
+                        
+                        self.table.setItem(row, col_offset, time_item)
+                        self.table.setItem(row, col_offset + 1, std_item)
+                        
+                        self._apply_color_to_cell(time_item, sector_stats['moving_avg'], 
+                                                extremes, 'times', sector_key, time_settings)
+                        self._apply_color_to_cell(std_item, sector_stats['std_dev'], 
+                                                extremes, 'std_devs', sector_key, std_settings)
 
             self.table.setSortingEnabled(True)  # ソートを再有効化
 
@@ -200,20 +218,23 @@ class StatisticsTableWidget(BaseTableWidget):
     
     def _find_extreme_values(self, stats_data):
         """最速/最遅タイムと最大/最小標準偏差を特定"""
+        # セクター数を取得
+        num_sectors = self.config_manager.get_num_sectors() if self.config_manager else 3
+        
         extremes = {
             'times': {
-                'lap_time': {'min': float('inf'), 'max': float('-inf')},
-                'sector1': {'min': float('inf'), 'max': float('-inf')},
-                'sector2': {'min': float('inf'), 'max': float('-inf')},
-                'sector3': {'min': float('inf'), 'max': float('-inf')}
+                'lap_time': {'min': float('inf'), 'max': float('-inf')}
             },
             'std_devs': {
-                'lap_time': {'min': float('inf'), 'max': float('-inf')},
-                'sector1': {'min': float('inf'), 'max': float('-inf')},
-                'sector2': {'min': float('inf'), 'max': float('-inf')},
-                'sector3': {'min': float('inf'), 'max': float('-inf')}
+                'lap_time': {'min': float('inf'), 'max': float('-inf')}
             }
         }
+        
+        # セクターごとの極値を初期化
+        for i in range(1, num_sectors + 1):
+            sector_key = f'sector{i}'
+            extremes['times'][sector_key] = {'min': float('inf'), 'max': float('-inf')}
+            extremes['std_devs'][sector_key] = {'min': float('inf'), 'max': float('-inf')}
 
         # 全ての値をスキャンして最大/最小を特定
         for stats in stats_data.values():
@@ -227,16 +248,18 @@ class StatisticsTableWidget(BaseTableWidget):
                 extremes['std_devs']['lap_time']['min'] = min(extremes['std_devs']['lap_time']['min'], lap_std)
                 extremes['std_devs']['lap_time']['max'] = max(extremes['std_devs']['lap_time']['max'], lap_std)
 
-            # セクタータイム
-            for sector in ['sector1', 'sector2', 'sector3']:
-                sector_time = stats['sectors'][sector]['moving_avg']
-                sector_std = stats['sectors'][sector]['std_dev']
-                if sector_time > 0:
-                    extremes['times'][sector]['min'] = min(extremes['times'][sector]['min'], sector_time)
-                    extremes['times'][sector]['max'] = max(extremes['times'][sector]['max'], sector_time)
-                if sector_std > 0:
-                    extremes['std_devs'][sector]['min'] = min(extremes['std_devs'][sector]['min'], sector_std)
-                    extremes['std_devs'][sector]['max'] = max(extremes['std_devs'][sector]['max'], sector_std)
+            # セクタータイム（動的に処理）
+            for i in range(1, num_sectors + 1):
+                sector_key = f'sector{i}'
+                if sector_key in stats['sectors']:
+                    sector_time = stats['sectors'][sector_key]['moving_avg']
+                    sector_std = stats['sectors'][sector_key]['std_dev']
+                    if sector_time > 0:
+                        extremes['times'][sector_key]['min'] = min(extremes['times'][sector_key]['min'], sector_time)
+                        extremes['times'][sector_key]['max'] = max(extremes['times'][sector_key]['max'], sector_time)
+                    if sector_std > 0:
+                        extremes['std_devs'][sector_key]['min'] = min(extremes['std_devs'][sector_key]['min'], sector_std)
+                        extremes['std_devs'][sector_key]['max'] = max(extremes['std_devs'][sector_key]['max'], sector_std)
 
         return extremes
     

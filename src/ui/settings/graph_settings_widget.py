@@ -29,6 +29,14 @@ class GraphSettingsWidget(BaseSettingsWidget):
         self.grid_checkbox.setChecked(grid_enabled)
         graph_display_layout.addWidget(self.grid_checkbox, 1, 0, 1, 2)
         
+        # セクター数設定を追加
+        graph_display_layout.addWidget(QLabel("セクター数:"), 2, 0)
+        self.num_sectors_spinbox = QSpinBox()
+        self.num_sectors_spinbox.setRange(1, 10)  # 1〜10のセクターをサポート
+        self.num_sectors_spinbox.setValue(self.config_manager.get_num_sectors())
+        self.num_sectors_spinbox.setToolTip("トラック上のセクター数を設定します（変更後は再起動が必要です）")
+        graph_display_layout.addWidget(self.num_sectors_spinbox, 2, 1)
+        
         graph_display_group.setLayout(graph_display_layout)
         layout.addWidget(graph_display_group)
         
@@ -161,3 +169,6 @@ class GraphSettingsWidget(BaseSettingsWidget):
         # ライダー色設定の保存
         for rider, color_button in self.rider_colors.items():
             self.config_manager.set_setting("graph", f"rider_color_{rider}", color_button.get_color())
+        
+        # セクター数設定を保存
+        self.config_manager.set_num_sectors(self.num_sectors_spinbox.value())

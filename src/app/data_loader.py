@@ -46,6 +46,9 @@ class DataLoader:
             if not isinstance(lap_data, list):
                 raise ValueError("Invalid lap_data format: must be an array")
 
+            # セクター数を取得
+            num_sectors = self.config.get_num_sectors()
+
             # ラップデータの処理
             processed_laps = []
             for i, lap in enumerate(lap_data):
@@ -54,25 +57,36 @@ class DataLoader:
                     continue
 
                 try:
-                    # 基本データの検証と変換
-                    required_fields = ['Rider', 'Lap', 'LapTime', 'Sector1', 'Sector2', 'Sector3']
+                    # 必須フィールドを動的に構築
+                    required_fields = ['Rider', 'Lap', 'LapTime']
+                    for j in range(1, num_sectors + 1):
+                        required_fields.append(f'Sector{j}')
+                    
+                    # 必須フィールドの存在チェック
                     missing_fields = [field for field in required_fields if field not in lap]
                     if missing_fields:
                         print(f"Warning: Missing required fields in lap data at index {i}: {', '.join(missing_fields)}")
                         continue
 
+                    # 基本データの処理
                     processed_lap = {
                         'Rider': str(lap['Rider']),
                         'Lap': int(lap['Lap']),
                         'LapTime': str(lap['LapTime']),
-                        'Sector1': str(lap['Sector1']),
-                        'Sector2': str(lap['Sector2']),
-                        'Sector3': str(lap['Sector3'])
                     }
+                    
+                    # セクターデータの処理（動的）
+                    for j in range(1, num_sectors + 1):
+                        sector_key = f'Sector{j}'
+                        processed_lap[sector_key] = str(lap.get(sector_key, ''))
 
                     # タイムデータの検証
                     invalid_time_fields = []
-                    for field in ['LapTime', 'Sector1', 'Sector2', 'Sector3']:
+                    time_fields = ['LapTime']
+                    for j in range(1, num_sectors + 1):
+                        time_fields.append(f'Sector{j}')
+                        
+                    for field in time_fields:
                         if not self.time_converter.is_valid_time_string(processed_lap[field]):
                             invalid_time_fields.append(f"{field}={processed_lap[field]}")
                     
@@ -110,7 +124,13 @@ class DataLoader:
     def _process_csv_data(self, df: pd.DataFrame) -> Dict:
         """CSVデータを処理して標準形式に変換する"""
         try:
-            required_columns = ['Rider', 'Lap', 'LapTime', 'Sector1', 'Sector2', 'Sector3']
+            # セクター数を取得
+            num_sectors = self.config.get_num_sectors()
+            
+            # 必須カラムを動的に構築
+            required_columns = ['Rider', 'Lap', 'LapTime']
+            for i in range(1, num_sectors + 1):
+                required_columns.append(f'Sector{i}')
             
             # 必要なカラムが存在するか確認
             missing_columns = [col for col in required_columns if col not in df.columns]
@@ -126,14 +146,19 @@ class DataLoader:
                         'Rider': str(row['Rider']),
                         'Lap': int(row['Lap']),
                         'LapTime': str(row['LapTime']),
-                        'Sector1': str(row['Sector1']),
-                        'Sector2': str(row['Sector2']),
-                        'Sector3': str(row['Sector3'])
                     }
+                    
+                    # セクターデータの処理（動的）
+                    for j in range(1, num_sectors + 1):
+                        sector_key = f'Sector{j}'
+                        lap[sector_key] = str(row[sector_key])
 
                     # タイムデータの検証
-                    if not all(self.time_converter.is_valid_time_string(lap[field]) 
-                             for field in ['LapTime', 'Sector1', 'Sector2', 'Sector3']):
+                    time_fields = ['LapTime']
+                    for j in range(1, num_sectors + 1):
+                        time_fields.append(f'Sector{j}')
+                        
+                    if not all(self.time_converter.is_valid_time_string(lap[field]) for field in time_fields):
                         print(f"Warning: Invalid time format in row {i}")
                         continue
 
@@ -188,6 +213,9 @@ class DataLoader:
         try:
             if not isinstance(data, list):
                 raise ValueError("Invalid data format: expected a list of lap data")
+            
+            # セクター数を取得
+            num_sectors = self.config.get_num_sectors()
                 
             formatted_data = []
             
@@ -197,8 +225,12 @@ class DataLoader:
                         print(f"Warning: Invalid lap data at index {i}: not a dictionary")
                         continue
                         
+                    # 必須フィールドを動的に構築
+                    required_fields = ['Rider', 'Lap', 'LapTime']
+                    for j in range(1, num_sectors + 1):
+                        required_fields.append(f'Sector{j}')
+                    
                     # 必須フィールドの検証
-                    required_fields = ['Rider', 'Lap', 'LapTime', 'Sector1', 'Sector2', 'Sector3']
                     missing_fields = [field for field in required_fields if field not in lap]
                     if missing_fields:
                         print(f"Warning: Missing required fields in lap data at index {i}: {', '.join(missing_fields)}")
@@ -206,7 +238,11 @@ class DataLoader:
                         
                     # タイムデータの検証
                     invalid_time_fields = []
-                    for field in ['LapTime', 'Sector1', 'Sector2', 'Sector3']:
+                    time_fields = ['LapTime']
+                    for j in range(1, num_sectors + 1):
+                        time_fields.append(f'Sector{j}')
+                        
+                    for field in time_fields:
                         if not self.time_converter.is_valid_time_string(lap[field]):
                             invalid_time_fields.append(f"{field}={lap[field]}")
                     
@@ -219,14 +255,18 @@ class DataLoader:
                         "Rider": lap['Rider'],
                         "Lap": lap['Lap'],
                         "LapTime": lap['LapTime'],
-                        "Sector1": lap['Sector1'],
-                        "Sector2": lap['Sector2'],
-                        "Sector3": lap['Sector3'],
-                        "conditions": {
-                            "tire": str(lap.get('TireType', '')),
-                            "weather": str(lap.get('Weather', '')),
-                            "track_temp": str(lap.get('TrackTemp', ''))
-                        }
+                    }
+                    
+                    # セクターデータの追加（動的）
+                    for j in range(1, num_sectors + 1):
+                        sector_key = f'Sector{j}'
+                        formatted_lap[sector_key] = lap.get(sector_key, '')
+                    
+                    # コンディション情報の追加
+                    formatted_lap["conditions"] = {
+                        "tire": str(lap.get('TireType', '')),
+                        "weather": str(lap.get('Weather', '')),
+                        "track_temp": str(lap.get('TrackTemp', ''))
                     }
                     
                     formatted_data.append(formatted_lap)

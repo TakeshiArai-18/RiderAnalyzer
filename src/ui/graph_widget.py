@@ -10,6 +10,7 @@ import numpy as np
 from app.analyzer import LapTimeAnalyzer
 import pandas as pd
 from utils.time_converter import TimeConverter
+import matplotlib.patches as mpatches
 
 class GraphWidget(QWidget):
     def __init__(self, analyzer: LapTimeAnalyzer, parent=None):
@@ -373,35 +374,72 @@ class GraphWidget(QWidget):
         if self.data is None:
             return
             
-        sector_cols = ['Sector1', 'Sector2', 'Sector3']
-        selected_rider = self.rider_combo.currentText()
+        # セクター数を取得
+        num_sectors = self.analyzer.config_manager.get_num_sectors()
+        # セクターカラムを動的に生成
+        sector_cols = [f'Sector{i}' for i in range(1, num_sectors + 1)]
         
-        if selected_rider == "All Riders":
-            # 全ライダーのセクタータイム比較
+        selected_rider = self.rider_combo.currentText()
+        is_all_riders = selected_rider == "All Riders"
+        
+        # 全ライダーの場合
+        if is_all_riders:
+            # ライダーごとのデータをグループ化して表示
             riders = self.data['Rider'].unique()
-            x = np.arange(len(sector_cols))
-            width = 0.8 / len(riders)
+            bar_width = 0.8 / len(riders)  # ライダー数に基づいて棒の幅を調整
             
-            has_valid_data = False  # 有効なデータがあるかのフラグ
+            # 凡例用のハンドルを保存するリスト
+            legend_handles = []
+            legend_labels = []
             
-            for i, rider in enumerate(riders):
+            for idx, rider in enumerate(riders):
                 rider_data = self.data[self.data['Rider'] == rider].copy()
+                has_valid_bars = False
+                
                 if not rider_data.empty:
-                    # 有効なセクタータイムを確認
-                    sector_times = [
-                        np.mean([self.time_to_seconds(t) for t in rider_data[col] if self._is_valid_time(t)])
-                        for col in sector_cols
-                    ]
+                    # 各セクターの平均値を計算
+                    sector_times = []
+                    for col in sector_cols:
+                        # 有効な時間データのみ使用
+                        times = [self.time_to_seconds(t) for t in rider_data[col] if self._is_valid_time(t)]
+                        sector_times.append(np.mean(times) if times else np.nan)
                     
-                    # 有効なセクタータイムが存在するか確認
-                    if any(not np.isnan(t) for t in sector_times):
-                        ax.bar(x + i * width, sector_times, width, label=rider)
-                        has_valid_data = True  # 有効なデータがあるとマーク
+                    # バーの位置を調整（ライダーごとにオフセット）
+                    bar_positions = np.arange(len(sector_cols)) + (idx - len(riders)/2 + 0.5) * bar_width
+                    
+                    # ライダーごとの色を取得
+                    rider_color = self.analyzer.config_manager.get_rider_color(rider)
+                    
+                    # 各セクターに棒グラフをプロット
+                    for i, (pos, time) in enumerate(zip(bar_positions, sector_times)):
+                        if not np.isnan(time):  # 有効な値のみプロット
+                            if rider_color:
+                                bar = ax.bar(pos, time, bar_width, alpha=0.7, color=rider_color)
+                            else:
+                                bar = ax.bar(pos, time, bar_width, alpha=0.7)
+                            has_valid_bars = True
+                    
+                    # 凡例を追加
+                    if has_valid_bars:
+                        # カスタムカラーがあれば使用
+                        if rider_color:
+                            patch = mpatches.Patch(color=rider_color, label=rider)
+                        else:
+                            # デフォルトの色を取得
+                            patch = mpatches.Patch(color=plt.cm.tab10(idx % 10), label=rider)
+                        legend_handles.append(patch)
+                        legend_labels.append(rider)
             
-            # 有効なデータがある場合のみ凡例を表示
-            if has_valid_data and len(ax.patches) > 0:  # 棒グラフのパッチを確認
-                ax.legend(loc='upper right', fontsize='small')
-            title = 'Average Sector Times - All Riders'
+            # 凡例を表示（有効なデータがある場合のみ）
+            if legend_handles:
+                ax.legend(handles=legend_handles, labels=legend_labels, 
+                       loc='upper right', fontsize='small')
+            
+            # X軸ラベルを中央に配置
+            ax.set_xticks(np.arange(len(sector_cols)))
+            ax.set_xticklabels(sector_cols)
+            
+            title = 'Sector Time Comparison - All Riders'
         else:
             # 選択されたライダーのセクタータイム比較
             rider_data = self.data[self.data['Rider'] == selected_rider].copy()
@@ -422,7 +460,7 @@ class GraphWidget(QWidget):
                 # 凡例を表示（有効なデータがある場合のみ）
                 if has_valid_bars and len(ax.patches) > 0:  # 棒グラフのパッチを確認
                     ax.legend(loc='upper right', fontsize='small')
-            title = f'Average Sector Times - {selected_rider}'
+            title = f'Sector Time Comparison - {selected_rider}'
         
         ax.set_title(title)
         ax.set_xticks(np.arange(len(sector_cols)))
@@ -437,8 +475,12 @@ class GraphWidget(QWidget):
             
         # 設定から移動平均のウィンドウサイズを取得
         window_size = int(self.analyzer.config_manager.get_setting("graph_settings", "lap_trend_window_size") or 5)
-            
-        sector_cols = ['Sector1', 'Sector2', 'Sector3']
+        
+        # セクター数を取得
+        num_sectors = self.analyzer.config_manager.get_num_sectors()
+        # セクターカラムを動的に生成
+        sector_cols = [f'Sector{i}' for i in range(1, num_sectors + 1)]
+        
         selected_rider = self.rider_combo.currentText()
         is_all_riders = selected_rider == "All Riders"
         
@@ -660,8 +702,12 @@ class GraphWidget(QWidget):
         # 設定から値を取得
         alpha = float(self.analyzer.config_manager.get_setting("graph_settings", "radar_alpha") or 0.2)
         window_size = int(self.analyzer.config_manager.get_setting("graph_settings", "radar_window_size") or 3)
-            
-        sector_cols = ['Sector1', 'Sector2', 'Sector3']
+        
+        # セクター数を取得
+        num_sectors = self.analyzer.config_manager.get_num_sectors()
+        # セクターカラムを動的に生成
+        sector_cols = [f'Sector{i}' for i in range(1, num_sectors + 1)]
+        
         angles = np.linspace(0, 2*np.pi, len(sector_cols), endpoint=False)
         
         selected_rider = self.rider_combo.currentText()

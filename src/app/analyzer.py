@@ -21,15 +21,22 @@ class LapTimeAnalyzer:
             if not laps:
                 return self._create_empty_analysis()
 
+            # セクター数を取得
+            num_sectors = self.config_manager.get_num_sectors()
+
             # 時間データを数値に変換
             processed_laps = []
             for lap in laps:
                 try:
                     processed_lap = lap.copy()
                     processed_lap['time'] = self.time_converter.string_to_seconds(lap['LapTime'])
-                    processed_lap['sector1'] = self.time_converter.string_to_seconds(lap['Sector1'])
-                    processed_lap['sector2'] = self.time_converter.string_to_seconds(lap['Sector2'])
-                    processed_lap['sector3'] = self.time_converter.string_to_seconds(lap['Sector3'])
+                    
+                    # セクターデータを動的に処理
+                    for i in range(1, num_sectors + 1):
+                        sector_key = f'Sector{i}'
+                        processed_key = f'sector{i}'  # 小文字のキーを使用
+                        processed_lap[processed_key] = self.time_converter.string_to_seconds(lap[sector_key])
+                        
                     processed_laps.append(processed_lap)
                 except (ValueError, TypeError) as e:
                     print(f"Warning: Skipping invalid lap data: {str(e)}")
@@ -66,7 +73,8 @@ class LapTimeAnalyzer:
                 'slowest_lap': slowest_lap,
                 'rider_stats': rider_stats,
                 'sector_stats': sector_stats,
-                'total_laps': len(processed_laps)
+                'total_laps': len(processed_laps),
+                'num_sectors': num_sectors  # セクター数を結果に含める
             }
 
         except Exception as e:
@@ -78,20 +86,31 @@ class LapTimeAnalyzer:
         try:
             if not laps:
                 return {}
-
-            sectors = ['sector1', 'sector2', 'sector3']
+                
+            # セクター数を取得
+            num_sectors = self.config_manager.get_num_sectors()
+                
+            # ライダー一覧を取得
+            riders = set(lap['Rider'] for lap in laps)
+            
             stats = {}
-
-            for sector in sectors:
-                sector_times = [lap[sector] for lap in laps if sector in lap]
-                if sector_times:
-                    stats[sector] = {
-                        'best': min(sector_times),
-                        'worst': max(sector_times),
-                        'avg': np.mean(sector_times),
-                        'std_dev': np.std(sector_times) if len(sector_times) > 1 else 0
-                    }
-
+            for rider in riders:
+                rider_laps = [lap for lap in laps if lap['Rider'] == rider]
+                if rider_laps:
+                    # セクターデータを動的に処理
+                    sector_stats = {}
+                    for i in range(1, num_sectors + 1):
+                        sector_key = f'sector{i}'
+                        times = [lap[sector_key] for lap in rider_laps]
+                        sector_stats[sector_key] = {
+                            'best': min(times),
+                            'worst': max(times),
+                            'avg': np.mean(times),
+                            'std_dev': np.std(times) if len(times) > 1 else 0
+                        }
+                    
+                    stats[rider] = sector_stats
+                    
             return stats
         except Exception as e:
             print(f"Error in _calculate_sector_stats: {str(e)}")
@@ -99,13 +118,18 @@ class LapTimeAnalyzer:
 
     def _create_empty_analysis(self) -> Dict:
         """空の分析結果を作成する"""
-        return {
+        # セクター数を取得
+        num_sectors = self.config_manager.get_num_sectors()
+        
+        empty_stats = {
             'fastest_lap': None,
             'slowest_lap': None,
             'rider_stats': {},
             'sector_stats': {},
-            'total_laps': 0
+            'total_laps': 0,
+            'num_sectors': num_sectors  # セクター数を含める
         }
+        return empty_stats
 
     def get_rider_stats(self, rider: str, laps: List[Dict], analysis_results=None) -> Optional[Dict]:
         """特定のライダーの統計を取得する"""
@@ -121,12 +145,45 @@ class LapTimeAnalyzer:
 
     def get_sector_stats(self, laps: List[Dict], analysis_results=None) -> Dict:
         """セクター統計を取得する"""
+        if analysis_results and 'sector_stats' in analysis_results:
+            return analysis_results['sector_stats']
+            
+        # セクター数を取得
+        num_sectors = self.config_manager.get_num_sectors()
+        
         try:
-            if analysis_results is None:
-                analysis = self.analyze_laps(laps)
-            else:
-                analysis = analysis_results
-            return analysis['sector_stats']
+            if not laps:
+                return {}
+
+            stats = {}
+            riders = set(lap['Rider'] for lap in laps)
+
+            for rider in riders:
+                rider_laps = [lap for lap in laps if lap['Rider'] == rider]
+                if rider_laps:
+                    sector_data = {}
+                    
+                    # ラップタイムの移動統計
+                    lap_times = [
+                        self.time_converter.string_to_seconds(lap['LapTime'])
+                        for lap in rider_laps
+                    ]
+                    sector_data['lap_time'] = self._calculate_moving_stats(lap_times)
+                    
+                    # セクターデータを動的に処理
+                    sector_data['sectors'] = {}
+                    for i in range(1, num_sectors + 1):
+                        sector_key = f'sector{i}'
+                        sector_name = f'Sector{i}'
+                        times = [
+                            self.time_converter.string_to_seconds(lap[sector_name])
+                            for lap in rider_laps
+                        ]
+                        sector_data['sectors'][sector_key] = self._calculate_moving_stats(times)
+                    
+                    stats[rider] = sector_data
+
+            return stats
         except Exception as e:
             print(f"Error in get_sector_stats: {str(e)}")
             return {}
@@ -147,7 +204,9 @@ class LapTimeAnalyzer:
                     'sectors': {
                         'sector1': {'moving_avg': float, 'std_dev': float},
                         'sector2': {'moving_avg': float, 'std_dev': float},
-                        'sector3': {'moving_avg': float, 'std_dev': float}
+                        'sector3': {'moving_avg': float, 'std_dev': float},
+                        ... 
+                        # 可変数のセクター
                     }
                 }
             }
@@ -156,32 +215,34 @@ class LapTimeAnalyzer:
             if not laps:
                 return {}
 
+            # セクター数を取得
+            num_sectors = self.config_manager.get_num_sectors()
+            
             stats = {}
             riders = set(lap['Rider'] for lap in laps)
 
             for rider in riders:
                 rider_laps = [lap for lap in laps if lap['Rider'] == rider]
                 if rider_laps:
-                    stats[rider] = {
+                    # ラップタイム統計を初期化
+                    rider_stats = {
                         'lap_time': self._calculate_moving_stats([
                             self.time_converter.string_to_seconds(lap['LapTime'])
                             for lap in rider_laps
                         ]),
-                        'sectors': {
-                            'sector1': self._calculate_moving_stats([
-                                self.time_converter.string_to_seconds(lap['Sector1'])
-                                for lap in rider_laps
-                            ]),
-                            'sector2': self._calculate_moving_stats([
-                                self.time_converter.string_to_seconds(lap['Sector2'])
-                                for lap in rider_laps
-                            ]),
-                            'sector3': self._calculate_moving_stats([
-                                self.time_converter.string_to_seconds(lap['Sector3'])
-                                for lap in rider_laps
-                            ])
-                        }
+                        'sectors': {}
                     }
+                    
+                    # セクター統計を動的に計算
+                    for i in range(1, num_sectors + 1):
+                        sector_key = f'sector{i}'
+                        sector_data_key = f'Sector{i}'
+                        rider_stats['sectors'][sector_key] = self._calculate_moving_stats([
+                            self.time_converter.string_to_seconds(lap[sector_data_key])
+                            for lap in rider_laps
+                        ])
+                    
+                    stats[rider] = rider_stats
 
             return stats
         except Exception as e:

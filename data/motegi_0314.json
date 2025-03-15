@@ -1,0 +1,655 @@
+{
+  "session_info": {
+    "track": "もてぎ",
+    "date": "20250314",
+    "session_type": "Practice",
+    "Weather": "Dry",
+    "TrackTemp": "39.3"
+  },
+  "lap_data": [
+    {
+      "Rider": "藤田",
+      "Lap": 1,
+      "LapTime": "2:27.027",
+      "Sector1": "38.432",
+      "Sector2": "39.315",
+      "Sector3": "37.049",
+      "Sector4": "32.231",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 2,
+      "LapTime": "2:24.802",
+      "Sector1": "36.534",
+      "Sector2": "38.833",
+      "Sector3": "37.181",
+      "Sector4": "32.254",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 3,
+      "LapTime": "2:24.672",
+      "Sector1": "36.333",
+      "Sector2": "39.351",
+      "Sector3": "37.758",
+      "Sector4": "31.230",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 4,
+      "LapTime": "2:24.788",
+      "Sector1": "36.032",
+      "Sector2": "39.347",
+      "Sector3": "37.784",
+      "Sector4": "31.625",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 5,
+      "LapTime": "2:21.376",
+      "Sector1": "36.043",
+      "Sector2": "38.212",
+      "Sector3": "36.284",
+      "Sector4": "30.837",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 6,
+      "LapTime": "2:21.016",
+      "Sector1": "36.003",
+      "Sector2": "37.917",
+      "Sector3": "36.281",
+      "Sector4": "30.815",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 8,
+      "LapTime": "2:29.215",
+      "Sector1": "43.132",
+      "Sector2": "38.432",
+      "Sector3": "36.519",
+      "Sector4": "31.132",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 9,
+      "LapTime": "2:22.138",
+      "Sector1": "35.788",
+      "Sector2": "38.794",
+      "Sector3": "36.433",
+      "Sector4": "31.123",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 10,
+      "LapTime": "2:21.866",
+      "Sector1": "36.570",
+      "Sector2": "38.178",
+      "Sector3": "36.291",
+      "Sector4": "30.827",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 11,
+      "LapTime": "2:20.694",
+      "Sector1": "35.387",
+      "Sector2": "38.062",
+      "Sector3": "36.503",
+      "Sector4": "30.742",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 12,
+      "LapTime": "2:20.650",
+      "Sector1": "35.377",
+      "Sector2": "37.954",
+      "Sector3": "36.414",
+      "Sector4": "30.905",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 13,
+      "LapTime": "2:20.696",
+      "Sector1": "35.509",
+      "Sector2": "38.000",
+      "Sector3": "36.388",
+      "Sector4": "30.799",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 14,
+      "LapTime": "2:21.435",
+      "Sector1": "35.520",
+      "Sector2": "38.038",
+      "Sector3": "35.915",
+      "Sector4": "31.962",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 15,
+      "LapTime": "2:22.502",
+      "Sector1": "36.301",
+      "Sector2": "38.300",
+      "Sector3": "36.332",
+      "Sector4": "31.569",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 16,
+      "LapTime": "2:21.151",
+      "Sector1": "36.006",
+      "Sector2": "38.229",
+      "Sector3": "35.948",
+      "Sector4": "30.968",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 17,
+      "LapTime": "2:23.667",
+      "Sector1": "37.084",
+      "Sector2": "39.088",
+      "Sector3": "36.508",
+      "Sector4": "30.987",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 18,
+      "LapTime": "2:21.264",
+      "Sector1": "35.572",
+      "Sector2": "38.007",
+      "Sector3": "36.105",
+      "Sector4": "31.580",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 19,
+      "LapTime": "2:31.267",
+      "Sector1": "42.631",
+      "Sector2": "39.586",
+      "Sector3": "37.299",
+      "Sector4": "31.751",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 20,
+      "LapTime": "2:25.756",
+      "Sector1": "37.221",
+      "Sector2": "39.489",
+      "Sector3": "37.279",
+      "Sector4": "31.767",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 21,
+      "LapTime": "2:26.529",
+      "Sector1": "36.706",
+      "Sector2": "39.008",
+      "Sector3": "37.118",
+      "Sector4": "33.697",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 22,
+      "LapTime": "2:23.601",
+      "Sector1": "36.716",
+      "Sector2": "38.756",
+      "Sector3": "36.721",
+      "Sector4": "31.408",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 23,
+      "LapTime": "2:22.927",
+      "Sector1": "36.336",
+      "Sector2": "38.424",
+      "Sector3": "36.687",
+      "Sector4": "31.480",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 24,
+      "LapTime": "2:22.870",
+      "Sector1": "36.143",
+      "Sector2": "38.776",
+      "Sector3": "36.896",
+      "Sector4": "31.055",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "藤田",
+      "Lap": 25,
+      "LapTime": "2:21.754",
+      "Sector1": "36.017",
+      "Sector2": "38.322",
+      "Sector3": "36.321",
+      "Sector4": "31.094",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "國川",
+      "Lap": 1,
+      "LapTime": "2:21.329",
+      "Sector1": "35.886",
+      "Sector2": "38.612",
+      "Sector3": "36.087",
+      "Sector4": "30.744",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "國川",
+      "Lap": 2,
+      "LapTime": "2:19.335",
+      "Sector1": "35.084",
+      "Sector2": "38.248",
+      "Sector3": "35.833",
+      "Sector4": "30.170",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "國川",
+      "Lap": 3,
+      "LapTime": "2:18.715",
+      "Sector1": "35.609",
+      "Sector2": "37.493",
+      "Sector3": "35.575",
+      "Sector4": "30.038",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "國川",
+      "Lap": 4,
+      "LapTime": "2:16.988",
+      "Sector1": "34.696",
+      "Sector2": "36.950",
+      "Sector3": "35.541",
+      "Sector4": "29.801",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "國川",
+      "Lap": 5,
+      "LapTime": "2:20.122",
+      "Sector1": "36.559",
+      "Sector2": "37.310",
+      "Sector3": "36.078",
+      "Sector4": "30.175",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 1,
+      "LapTime": "2:46.477",
+      "Sector1": "49.519",
+      "Sector2": "42.513",
+      "Sector3": "39.767",
+      "Sector4": "34.678",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 2,
+      "LapTime": "2:37.098",
+      "Sector1": "39.936",
+      "Sector2": "42.843",
+      "Sector3": "39.676",
+      "Sector4": "34.643",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 3,
+      "LapTime": "2:37.267",
+      "Sector1": "40.298",
+      "Sector2": "42.783",
+      "Sector3": "39.283",
+      "Sector4": "34.903",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 4,
+      "LapTime": "2:36.918",
+      "Sector1": "40.000",
+      "Sector2": "42.930",
+      "Sector3": "38.968",
+      "Sector4": "35.020",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 5,
+      "LapTime": "2:37.403",
+      "Sector1": "39.913",
+      "Sector2": "42.991",
+      "Sector3": "39.273",
+      "Sector4": "35.226",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 6,
+      "LapTime": "2:38.278",
+      "Sector1": "40.318",
+      "Sector2": "43.927",
+      "Sector3": "39.313",
+      "Sector4": "34.720",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 7,
+      "LapTime": "2:36.393",
+      "Sector1": "39.832",
+      "Sector2": "42.609",
+      "Sector3": "39.045",
+      "Sector4": "34.907",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 8,
+      "LapTime": "2:37.108",
+      "Sector1": "40.203",
+      "Sector2": "42.574",
+      "Sector3": "39.915",
+      "Sector4": "34.416",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 9,
+      "LapTime": "2:37.961",
+      "Sector1": "40.503",
+      "Sector2": "42.753",
+      "Sector3": "39.373",
+      "Sector4": "35.332",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 10,
+      "LapTime": "2:35.377",
+      "Sector1": "40.244",
+      "Sector2": "42.685",
+      "Sector3": "38.785",
+      "Sector4": "33.663",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 11,
+      "LapTime": "2:37.355",
+      "Sector1": "40.415",
+      "Sector2": "43.185",
+      "Sector3": "38.994",
+      "Sector4": "34.761",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 12,
+      "LapTime": "2:35.508",
+      "Sector1": "39.463",
+      "Sector2": "42.381",
+      "Sector3": "39.080",
+      "Sector4": "34.584",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 13,
+      "LapTime": "2:35.432",
+      "Sector1": "39.111",
+      "Sector2": "42.373",
+      "Sector3": "39.598",
+      "Sector4": "34.350",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 14,
+      "LapTime": "2:33.652",
+      "Sector1": "39.086",
+      "Sector2": "42.118",
+      "Sector3": "38.490",
+      "Sector4": "33.958",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 15,
+      "LapTime": "2:34.385",
+      "Sector1": "39.081",
+      "Sector2": "42.227",
+      "Sector3": "38.408",
+      "Sector4": "34.669",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 16,
+      "LapTime": "2:34.546",
+      "Sector1": "39.362",
+      "Sector2": "42.604",
+      "Sector3": "38.675",
+      "Sector4": "33.905",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    },
+    {
+      "Rider": "長田",
+      "Lap": 17,
+      "LapTime": "2:33.763",
+      "Sector1": "39.478",
+      "Sector2": "41.528",
+      "Sector3": "38.655",
+      "Sector4": "34.102",
+      "conditions": {
+        "tire": "KR410",
+        "weather": "Dry",
+        "track_temp": "39.3"
+      }
+    }
+  ]
+}

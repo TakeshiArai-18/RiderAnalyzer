@@ -48,7 +48,8 @@
         }
     },
     "app_settings": {
-        "show_graph_window": true
+        "show_graph_window": true,
+        "num_sectors": 4 
     },
     "riders_settings": {
         "riders_list": [
@@ -140,8 +141,8 @@
             "session_type": "Practice",
             "conditions": {
                 "weather": "Dry",
-                "air_temp": 20.0,
-                "track_temp": 30.0
+                "air_temp": 16.0,
+                "track_temp": 39.3
             }
         }
     }

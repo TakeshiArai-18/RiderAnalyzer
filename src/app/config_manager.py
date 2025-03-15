@@ -26,6 +26,10 @@ class ConfigManager:
                 "sector3_column": "Sector3",
                 "rider_column": "Rider"
             },
+            "app_settings": {
+                "show_graph_window": True,  # グラフウィンドウを表示するかどうか
+                "num_sectors": 3  # セクター数のデフォルト値
+            },
             "graph_settings": {
                 "line_color": "#1f77b4",
                 "marker_size": 6,
@@ -61,9 +65,6 @@ class ConfigManager:
                     "lowest": "#C8E8FF",   # 薄い青
                     "enabled": True        # 色付けの有効/無効
                 }
-            },
-            "app_settings": {
-                "show_graph_window": True  # グラフウィンドウを表示するかどうか
             },
             "riders_settings": {
                 "riders_list": [
@@ -385,3 +386,26 @@ class ConfigManager:
         
         print(f"Debug - Config Manager - Processed session data: {result}")
         return result
+
+    def get_num_sectors(self) -> int:
+        """セクター数を取得する
+
+        Returns:
+            int: セクター数（デフォルトは3）
+        """
+        num_sectors = self.get_setting("app_settings", "num_sectors")
+        if not isinstance(num_sectors, int) or num_sectors < 1:
+            # デフォルト値を返す
+            return 3
+        return num_sectors
+
+    def set_num_sectors(self, num_sectors: int) -> None:
+        """セクター数を設定する
+
+        Args:
+            num_sectors (int): 設定するセクター数（1以上の整数）
+        """
+        if not isinstance(num_sectors, int) or num_sectors < 1:
+            raise ValueError("Number of sectors must be a positive integer")
+        self.update_setting("app_settings", "num_sectors", num_sectors)
+        self.save_config()
