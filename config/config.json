@@ -6,6 +6,10 @@
         "sector3_column": "Sector3",
         "rider_column": "Rider"
     },
+    "app_settings": {
+        "show_graph_window": true,
+        "num_sectors": 4
+    },
     "graph_settings": {
         "line_color": "#1f77b4",
         "marker_size": 6,
@@ -46,10 +50,6 @@
                 "lowest": "#C8E8FF"
             }
         }
-    },
-    "app_settings": {
-        "show_graph_window": true,
-        "num_sectors": 4 
     },
     "riders_settings": {
         "riders_list": [

@@ -11,6 +11,7 @@ from app.analyzer import LapTimeAnalyzer
 import pandas as pd
 from utils.time_converter import TimeConverter
 import matplotlib.patches as mpatches
+import colorsys
 
 class GraphWidget(QWidget):
     def __init__(self, analyzer: LapTimeAnalyzer, parent=None):
@@ -346,7 +347,17 @@ class GraphWidget(QWidget):
                 rider_data = self.data[self.data['Rider'] == rider].copy()
                 if not rider_data.empty:
                     lap_times = [self.time_to_seconds(t) for t in rider_data['LapTime']]
-                    ax.hist(lap_times, alpha=0.5, label=rider, bins=10, density=False)
+                    
+                    # ライダーごとの色を取得
+                    rider_color = self.analyzer.config_manager.get_rider_color(rider)
+                    
+                    if rider_color:
+                        # 設定された色を使用
+                        ax.hist(lap_times, alpha=0.5, label=rider, bins=10, density=False, color=rider_color)
+                    else:
+                        # 色が設定されていない場合はデフォルト色を使用
+                        ax.hist(lap_times, alpha=0.5, label=rider, bins=10, density=False)
+                        
             if len(ax.patches) > 0:  # ヒストグラムや棒グラフの要素を確認
                 ax.legend(loc='upper right', fontsize='small')
             title = 'Lap Time Distribution - All Riders'
@@ -355,7 +366,17 @@ class GraphWidget(QWidget):
             rider_data = self.data[self.data['Rider'] == selected_rider].copy()
             if not rider_data.empty:
                 lap_times = [self.time_to_seconds(t) for t in rider_data['LapTime']]
-                ax.hist(lap_times, alpha=0.5, bins=10, density=False)
+                
+                # 選択されたライダーの色を取得
+                rider_color = self.analyzer.config_manager.get_rider_color(selected_rider)
+                
+                if rider_color:
+                    # 設定された色を使用
+                    ax.hist(lap_times, alpha=0.5, bins=10, density=False, color=rider_color)
+                else:
+                    # 色が設定されていない場合はデフォルト色を使用
+                    ax.hist(lap_times, alpha=0.5, bins=10, density=False)
+                    
             title = f'Lap Time Distribution - {selected_rider}'
         
         # X軸を時間表記に変換
@@ -497,6 +518,42 @@ class GraphWidget(QWidget):
                     
         # 適切なY軸範囲を計算
         y_min, y_max = self._calculate_appropriate_y_range(all_sector_times)
+
+        # セクターごとの色を生成する関数
+        def generate_sector_colors(base_color, num_colors):
+            """ベースカラーから複数のセクター用のカラーバリエーションを生成"""
+            import colorsys
+            import matplotlib.colors as mcolors
+            
+            # HLSカラースペースに変換して色相を変える
+            rgb = mcolors.to_rgb(base_color)
+            h, l, s = colorsys.rgb_to_hls(rgb[0], rgb[1], rgb[2])
+            
+            colors = []
+            for i in range(num_colors):
+                # セクターごとに色相をずらす (0.05 = 18度)
+                new_h = (h + 0.05 * i) % 1.0
+                # 明度と彩度を少し調整
+                new_l = max(0.3, min(0.7, l + 0.1 * ((-1) ** i)))
+                new_s = min(1.0, s * (1.0 + 0.1 * i))
+                
+                # RGB形式に戻す
+                r, g, b = colorsys.hls_to_rgb(new_h, new_l, new_s)
+                colors.append(mcolors.to_hex((r, g, b)))
+                
+            return colors
+        
+        # セクターごとの線種を生成する関数
+        def generate_line_styles(num_sectors):
+            """セクター数に基づいて線種のリストを生成"""
+            # 使用可能な線種
+            line_styles = ['-', '--', '-.', ':']
+            
+            # セクター数に合わせて線種を割り当て（繰り返し使用）
+            return [line_styles[i % len(line_styles)] for i in range(num_sectors)]
+        
+        # セクターごとの線種を生成
+        sector_line_styles = generate_line_styles(len(sector_cols))
         
         # グラフの描画処理
         if is_all_riders:
@@ -507,7 +564,19 @@ class GraphWidget(QWidget):
                 rider_data = self.data[self.data['Rider'] == rider].copy()
                 if not rider_data.empty:
                     rider_data = rider_data.sort_values('Lap')
-                    for sector in sector_cols:
+                    
+                    # ライダーごとの基本色を取得
+                    base_color = self.analyzer.config_manager.get_rider_color(rider)
+                    if not base_color:
+                        # 固有の色を決定（カスタム色がない場合）
+                        color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+                        color_idx = len(legend_handles) % len(color_cycle)
+                        base_color = color_cycle[color_idx]
+                    
+                    # セクターごとの色バリエーションを生成
+                    sector_colors = generate_sector_colors(base_color, len(sector_cols))
+                    
+                    for i, sector in enumerate(sector_cols):
                         times = [self.time_to_seconds(t) for t in rider_data[sector] if self._is_valid_time(t)]
                         # 有効なデータのみを追加（異常値を除外）
                         valid_times = [t for t in times if t > 0.1]  # 0.1秒未満は無視
@@ -515,30 +584,22 @@ class GraphWidget(QWidget):
                         if not valid_times:  # 有効なデータがなければスキップ
                             continue
                         
-                        # ライダーごとの色を取得
-                        rider_color = self.analyzer.config_manager.get_rider_color(rider)
+                        # セクターごとの色と線種を使用
+                        sector_color = sector_colors[i]
+                        sector_line_style = sector_line_styles[i]
                         
                         # All Ridersモードでは実測値のプロットはスキップし、移動平均のみ表示する
-                        # 実測値用の変数を保持するだけ（移動平均の色用）
-                        line_color = rider_color
                         
                         # 移動平均値のプロット
                         if len(valid_times) >= 2:  # 少なくとも2つのデータポイントがある場合
                             moving_avg = self._calculate_moving_average(valid_times, window_size)
                             
-                            # 色の取得（カスタム色があればそれを使用）
-                            if not line_color:
-                                # 固有の色を決定（実測値プロットがないので個別に色を割り当て）
-                                color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
-                                color_idx = (len(legend_handles)) % len(color_cycle)
-                                line_color = color_cycle[color_idx]
-                                
                             avg_line = ax.plot(rider_data['Lap'][:len(moving_avg)], moving_avg,
                                     linewidth=line_width * 1.5,  # 線をさらに太くして視認性向上
                                     marker='None',  # マーカーを使用しない
-                                    linestyle=line_style,
+                                    linestyle=sector_line_style,  # セクターごとの線種
                                     label=f'{rider} - {sector}',  # 移動平均の表記は省略（凡例を単純化）
-                                    color=line_color)
+                                    color=sector_color)  # セクターごとの色を使用
                             
                             # 移動平均線の凡例を保存
                             legend_handles.append(avg_line[0])
@@ -564,55 +625,62 @@ class GraphWidget(QWidget):
             rider_data = self.data[self.data['Rider'] == selected_rider].copy()
             if not rider_data.empty:
                 rider_data = rider_data.sort_values('Lap')
-                all_times = []
-                for sector in sector_cols:
+                
+                # ライダーの基本色を取得
+                base_color = self.analyzer.config_manager.get_rider_color(selected_rider)
+                
+                # セクターごとの色バリエーションを生成
+                if base_color:
+                    sector_colors = generate_sector_colors(base_color, len(sector_cols))
+                else:
+                    # デフォルトのカラーサイクルを使用
+                    color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+                    sector_colors = [color_cycle[i % len(color_cycle)] for i in range(len(sector_cols))]
+                
+                for i, sector in enumerate(sector_cols):
                     times = [self.time_to_seconds(t) for t in rider_data[sector] if self._is_valid_time(t)]
-                    all_times.extend(times)  # 全ての時間を記録
-                    
-                    # ライダーごとの色を取得
-                    rider_color = self.analyzer.config_manager.get_rider_color(selected_rider)
+                    if not times:  # 有効なデータがなければスキップ
+                        continue
+                        
+                    # セクターごとの色と線種を使用
+                    sector_color = sector_colors[i]
+                    sector_line_style = sector_line_styles[i]
                     
                     # 実測値のプロット
-                    if rider_color:
-                        line = ax.plot(rider_data['Lap'], times,
-                               linewidth=line_width,
-                               marker='None',
-                               linestyle=line_style,
-                               label=sector,
-                               color=rider_color)
-                    else:
-                        line = ax.plot(rider_data['Lap'], times,
-                               linewidth=line_width,
-                               marker='None',
-                               linestyle=line_style,
-                               label=sector)
+                    line = ax.plot(rider_data['Lap'], times,
+                           linewidth=line_width,
+                           marker='None',
+                           linestyle=sector_line_style,  # セクターごとの線種
+                           label=sector,
+                           color=sector_color)  # セクターごとの色を使用
                     
                     # 移動平均値のプロット
                     moving_avg = self._calculate_moving_average(times, window_size)
-                    line_color = rider_color if rider_color else line[0].get_color()
                     ax.plot(rider_data['Lap'], moving_avg,
                            linewidth=line_width * 0.8,
                            marker='None',
-                           linestyle='--',
+                           linestyle='--',  # 移動平均は一貫して破線
                            label=f'{sector} Moving Avg',
-                           color=line_color,
+                           color=sector_color,  # セクターごとの色を使用
                            alpha=0.7)
             
-            # 凡例を適切な位置に配置
-            if len(ax.get_lines()) > 0:  # プロット要素があるか確認
-                ax.legend(loc='upper right', fontsize='small')
+                # 凡例を適切な場所に配置
+                if len(ax.get_lines()) > 0:
+                    ax.legend(loc='upper right', fontsize='small')
+                    
             title = f'Sector Time Trends - {selected_rider}'
-        
-        # Y軸の範囲を適切に設定
-        if y_min is not None and y_max is not None:
-            ax.set_ylim(bottom=y_min, top=y_max)
         
         ax.set_title(title)
         ax.set_xlabel('Lap Number')
-        ax.set_ylabel('Time (s)')
+        ax.set_ylabel('Time (seconds)')
         
-        # 凡例設定後に明示的にY軸範囲を再設定（上書き防止）
+        # Y軸の目盛りを時間形式で表示
         ax.yaxis.set_major_formatter(FuncFormatter(self._format_time_ticks))
+        
+        # グリッドを表示（設定に基づく）
+        grid_setting = self.analyzer.config_manager.get_setting("graph", "show_grid") or "Yes"
+        if grid_setting.lower() != "no":
+            ax.grid(True, linestyle='--', alpha=0.7)
 
     def _calculate_appropriate_y_range(self, times_list):
         """適切なY軸範囲を計算するヘルパーメソッド"""
